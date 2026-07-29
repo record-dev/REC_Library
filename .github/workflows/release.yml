@@ -9,20 +9,37 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Update fxmanifest.lua version
         run: |
           NEW_VERSION=${{ github.ref_name }}
           sed -i "s/^version\s\+['\"].*['\"]/version '$NEW_VERSION'/g" fxmanifest.lua
 
-      - name: Commit and Push changes
+      - name: Get GitHub App user info
+        id: app-user
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
+          echo "id=$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      - name: Commit and Push changes
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          git config --local user.name "${{ steps.app-token.outputs.app-slug }}[bot]"
+          git config --local user.email "${{ steps.app-user.outputs.id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
           git add fxmanifest.lua
           git commit -m "chore: bump version to ${{ github.ref_name }}"
           git pull --rebase origin main
