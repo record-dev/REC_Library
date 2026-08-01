@@ -58,7 +58,7 @@ function Ped:newFromNetId(netId)
         spawnedCoords = GetEntityCoords(handle),
         spawnedHeading = GetEntityHeading(handle),
         interiorId = 0,
-        roomKeyHash = 0,
+        roomHashKey = 0,
         isMissionEntity = false,
         isResolving = false,
     }
@@ -213,8 +213,8 @@ function Ped:spawn()
     SetBlockingOfNonTemporaryEvents(info.handle, info.isBlockingOfTemporaryEvents)
 
     --Give room key
-    if info.roomKeyHash ~= 0 then
-        ForceRoomForEntity(info.handle, GetInteriorFromEntity(info.handle), info.roomKeyHash)
+    if info.roomHashKey ~= 0 then
+        ForceRoomForEntity(info.handle, GetInteriorFromEntity(info.handle), info.roomHashKey)
     end
 
     -- ==== Various PED settings END ==== --

@@ -132,4 +132,15 @@ function Zone:getName()
     return self.info.name
 end
 
+---@return string
+function Zone:getRoomKey()
+    return self.info.roomKey --[[@as string]]
+end
+
+---@return integer
+function Zone:getRoomHashKey()
+    return self.info.roomHashKey
+end
+
+
 return Zone

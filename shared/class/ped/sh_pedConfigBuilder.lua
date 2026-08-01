@@ -18,7 +18,7 @@
 ---@field defaultRelationshipGroup? number
 ---@field relationshipGroup? number
 ---@field interiorId integer
----@field roomKeyHash integer
+---@field roomHashKey integer
 ---@field proofs? REC_Library.Shared.Class.Entity.EntityProofsConfigBuilder
 ---@field components? REC_Library.Shared.Class.Ped.PedComponentsConfigBuilder
 ---@field targetOptions? REC_Library.Client.Class.Target.OX.OXTargetConfigBuilder|REC_Library.Client.Class.Target.QB.QBTargetConfigBuilder|nil
@@ -56,7 +56,7 @@ function PedConfigBuilder:new(model, coords, heading)
     instance.type = 4
     instance.weaponAmmo = 255
     instance.interiorId = 0
-    instance.roomKeyHash = 0
+    instance.roomHashKey = 0
     instance.spawnTimeout = 1500
     instance.destroyTimeout = 1000
     instance.isFreezeEntity = false
@@ -154,7 +154,7 @@ function PedConfigBuilder:setRoomKey(roomKey)
     if roomKey == nil then return self end
     local valueType = type(roomKey)
     assert((valueType == "number" or valueType == "string"))
-    self.roomKeyHash = valueType == "string" and joaat(roomKey) or roomKey
+    self.roomHashKey = valueType == "string" and joaat(roomKey) or roomKey
     return self
 end
 

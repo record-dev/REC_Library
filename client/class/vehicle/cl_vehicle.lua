@@ -170,8 +170,8 @@ function Vehicle:spawn()
     end
 
     --Give room key
-    if info.roomKeyHash ~= 0 then
-        ForceRoomForEntity(info.handle, GetInteriorFromEntity(info.handle), info.roomKeyHash)
+    if info.roomHashKey ~= 0 then
+        ForceRoomForEntity(info.handle, GetInteriorFromEntity(info.handle), info.roomHashKey)
     end
 
     -- Release of fall protection

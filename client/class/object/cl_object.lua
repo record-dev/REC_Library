@@ -100,6 +100,8 @@ function Object:newByFind(targetModel, targetCoords, targetRadius, isMission)
         spawnedCoords = targetCoords,
         spawnedHeading = heading,
         spawnedRotation = GetEntityRotation(closestEntity),
+        roomKey = "",
+        roomHashKey = 0,
         isResolving = false,
     }
 
@@ -167,27 +169,28 @@ function Object:spawn(isInternalReplaceCall)
 
     end
 
-    -- Check if spawned
-    if info.handle == 0 or DoesEntityExist(info.handle) == false then
-        utils:debugPrint("Object:spawn: Failed to create object entity with UID " .. (info.uid or "N/A"))
-        info.isResolving = false
-        return false
-    end
-
     --Wait until fully spawned
     local timeout = 1200
     while DoesEntityExist(info.handle) == false do
-        Wait(100)
+        Wait(10)
 
         if timeout <= 0 then
             utils:debugPrint("^1waiting timeout^0")
             return false
         end
 
-        timeout = timeout - 50
+        timeout = timeout - 10
     end
 
     -- === Settings === --
+
+    -- Set room key
+    if info.roomHashKey ~= 0 then
+        local interiorId = GetInteriorAtCoords(info.coords.x, info.coords.y, info.coords.z)
+        ForceRoomForEntity(info.handle, interiorId, info.roomKey)
+        SetEntityVisible(info.handle, false, false)
+        SetEntityVisible(info.handle, true, false)
+    end
 
     -- Rotation settings
     if info.rotation ~= nil then
@@ -209,11 +212,6 @@ function Object:spawn(isInternalReplaceCall)
     -- LOD
     if info.lod ~= nil then
         SetEntityLodDist(info.handle, info.lod)
-    end
-
-    --Give room key
-    if info.roomKeyHash ~= 0 then
-        ForceRoomForEntity(info.handle, GetInteriorAtCoords(info.coords.x, info.coords.y, info.coords.z), info.roomKeyHash)
     end
 
     -- Texture variations

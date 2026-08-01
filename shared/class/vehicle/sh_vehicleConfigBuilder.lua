@@ -10,7 +10,7 @@
 ---@field heading number
 ---@field bodyHealth? number
 ---@field engineHealth? number
----@field roomKeyHash integer
+---@field roomHashKey integer
 ---@field proofs? REC_Library.Shared.Class.Entity.EntityProofsConfigBuilder
 ---@field plate? string
 ---@field fuel? number
@@ -97,7 +97,7 @@ function VehicleConfigBuilder:setRoomKey(roomKey)
     if roomKey == nil then return self end
     local valueType = type(roomKey)
     assert((valueType == "number" or valueType == "string"))
-    self.roomKeyHash = valueType == "string" and joaat(roomKey) or roomKey
+    self.roomHashKey = valueType == "string" and joaat(roomKey) or roomKey
     return self
 end
 

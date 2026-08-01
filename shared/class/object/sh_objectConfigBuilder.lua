@@ -10,7 +10,8 @@
 ---@field customOffset? vector3
 ---@field heading number
 ---@field rotation? vector3
----@field roomKeyHash integer
+---@field roomKey string
+---@field roomHashKey integer
 ---@field alpha? number
 ---@field lod? number
 ---@field textureVariation? number
@@ -49,6 +50,7 @@ function ObjectConfigBuilder:new(model, coords, heading)
     instance.spawnedCoords = coords
     instance.spawnedHeading = heading
     instance.spawnTimeout = 1500
+    instance.roomHashKey = 0
     instance.destroyTimeout = 1000
     instance.isNetworked = false
     instance.isMissionEntity = false
@@ -71,7 +73,7 @@ end
 ---@return self
 function ObjectConfigBuilder:setType(entityType)
     if entityType == nil then return self end
-    assert(type(string) == "string")
+    assert(type(entityType) == "string")
     self.type = entityType return self
 end
 
@@ -122,7 +124,8 @@ function ObjectConfigBuilder:setRoomKey(roomKey)
     if roomKey == nil then return self end
     local valueType = type(roomKey)
     assert((valueType == "number" or valueType == "string"))
-    self.roomKeyHash = valueType == "string" and GetHashKey(roomKey) or roomKey
+    self.roomKey = valueType == "number" and tostring(roomKey) or roomKey
+    self.roomHashKey = valueType == "string" and joaat(roomKey) or roomKey
     return self
 end
 
