@@ -187,9 +187,7 @@ function Object:spawn(isInternalReplaceCall)
     -- Set room key
     if info.roomHashKey ~= 0 then
         local interiorId = GetInteriorAtCoords(info.coords.x, info.coords.y, info.coords.z)
-        ForceRoomForEntity(info.handle, interiorId, info.roomKey)
-        SetEntityVisible(info.handle, false, false)
-        SetEntityVisible(info.handle, true, false)
+        ForceRoomForEntity(info.handle, interiorId, info.roomHashKey)
     end
 
     -- Rotation settings
