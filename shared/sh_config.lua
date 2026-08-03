@@ -111,7 +111,6 @@ config.vehiclefuel = getConfigValue({
     { resource = "qb-fuel", value = "qb" },
     { resource = "lc_fuel", value = "lc" },
     { resource = "cdn-fuel", value = "cdn" },
-    { resource = "wasabi_carlock", value = "wsb" },
 })
 
 ---[[
