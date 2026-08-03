@@ -41,7 +41,7 @@ config.debugMode = true
 config.language = "ja"
 
 ---[[
----      Ditect Framework
+---      Detect Framework
 ---]]
 ---@type REC_Library.Shared.Enums.Framework
 config.framework = getConfigValue({
@@ -53,7 +53,7 @@ config.framework = getConfigValue({
 
 
 ---[[
----      Ditect Inventory
+---      Detect Inventory
 ---]]
 ---@type REC_Library.Shared.Enums.Inventory
 config.inventory = getConfigValue({
@@ -62,7 +62,7 @@ config.inventory = getConfigValue({
 })
 
 ---[[
----      Ditect Bank
+---      Detect Bank
 ---]]
 ---@type REC_Library.Shared.Enums.Bank
 config.bank = getConfigValue({
@@ -74,7 +74,7 @@ config.bank = getConfigValue({
 })
 
 ---[[
----      Ditect Medicals
+---      Detect Medicals
 ---]]
 ---@type REC_Library.Shared.Enums.Medicals
 config.medical = getConfigValue({
@@ -85,7 +85,7 @@ config.medical = getConfigValue({
 })
 
 ---[[
----      Ditect Target
+---      Detect Target
 ---]]
 ---@type REC_Library.Shared.Enums.Target
 config.target = getConfigValue({
@@ -94,7 +94,7 @@ config.target = getConfigValue({
 })
 
 ---[[
----      Ditect Doors
+---      Detect Doors
 ---]]
 ---@type REC_Library.Shared.Enums.Doors
 config.door = getConfigValue({
@@ -103,7 +103,7 @@ config.door = getConfigValue({
 })
 
 ---[[
----      Ditect Vehicleyfuel
+---      Detect Vehicleyfuel
 ---]]
 ---@type REC_Library.Shared.Enums.Vehiclefuel
 config.vehiclefuel = getConfigValue({
@@ -115,7 +115,7 @@ config.vehiclefuel = getConfigValue({
 })
 
 ---[[
----      Ditect Vehiclekeys
+---      Detect Vehiclekeys
 ---]]
 ---@type REC_Library.Shared.Enums.Vehiclekeys
 config.vehiclekeys = getConfigValue({
@@ -125,7 +125,7 @@ config.vehiclekeys = getConfigValue({
 })
 
 ---[[
----      Ditect Dispatch
+---      Detect Dispatch
 ---]]
 ---@type REC_Library.Shared.Enums.Dispatch
 config.dispatch = getConfigValue({
@@ -134,7 +134,7 @@ config.dispatch = getConfigValue({
 })
 
 ---[[
----      Ditect Notify
+---      Detect Notify
 ---]]
 ---@type REC_Library.Shared.Enums.Notify
 config.notify = getConfigValue({

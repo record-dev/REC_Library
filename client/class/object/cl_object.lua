@@ -184,12 +184,6 @@ function Object:spawn(isInternalReplaceCall)
 
     -- === Settings === --
 
-    -- Set room key
-    if info.roomHashKey ~= 0 then
-        local interiorId = GetInteriorAtCoords(info.coords.x, info.coords.y, info.coords.z)
-        ForceRoomForEntity(info.handle, interiorId, info.roomHashKey)
-    end
-
     -- Rotation settings
     if info.rotation ~= nil then
         SetEntityRotation(
@@ -227,6 +221,27 @@ function Object:spawn(isInternalReplaceCall)
 
     -- heading
     SetEntityHeading(info.handle, info.heading)
+
+    Citizen.CreateThread(function (threadId)
+        -- Set room key
+        if info.roomHashKey ~= 0 then
+            local interiorId = GetInteriorFromEntity(info.handle)
+
+            timeout = 1200
+            while interiorId == 0 do
+                Wait(10)
+                interiorId = GetInteriorFromEntity(info.handle)
+
+                if timeout <= 0 then
+                    utils:debugPrint("^1waiting timeout^0")
+                end
+
+                timeout = timeout - 10
+            end
+
+            ForceRoomForEntity(info.handle, interiorId, info.roomKey)
+        end
+    end)
 
     info.spawnedRotation = GetEntityRotation(info.handle)
 
