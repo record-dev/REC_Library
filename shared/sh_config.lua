@@ -46,7 +46,7 @@ config.language = "ja"
 ---@type REC_Library.Shared.Enums.Framework
 config.framework = getConfigValue({
     { resource = "ox_core", value = "ox" },
-    { resource = "qbx_core", value = "qbox" },
+    { resource = "qbx_core", value = "qbx" },
     { resource = "es_extended", value = "esx" },
     { resource = "qb-core", value = "qb" },
 })
