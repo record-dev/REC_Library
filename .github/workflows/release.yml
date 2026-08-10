@@ -79,12 +79,25 @@ jobs:
           cd "$DIST_DIR"
           zip -r "../${TARGET_NAME}.zip" "$TARGET_NAME"
 
+      - name: Update CHANGELOG
+        id: changelog
+        uses: requarks/changelog-action@v1
+        continue-on-error: true
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          tag: ${{ github.ref_name }}
+          includeInvalidCommits: true
+          useGitmojis: true
+          writeToFile: false
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
+
           files: ${{ github.event.repository.name }}.zip
           name: ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
+          body: ${{ steps.changelog.outputs.changes }}
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
