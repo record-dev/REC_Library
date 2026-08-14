@@ -108,7 +108,7 @@ jobs:
           CHANGELOG: ${{ steps.changelog.outputs.changes }}
           REPO_NAME: ${{ github.event.repository.name }}
           TAG_NAME: ${{ github.ref_name }}
-          LATEST_URL: https://github.com/${{ github.repository }}/releases/download/latest
+          LATEST_URL: https://github.com/${{ github.repository }}/releases/latest
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           set -e
