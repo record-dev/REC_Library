@@ -108,15 +108,22 @@ jobs:
           CHANGELOG: ${{ steps.changelog.outputs.changes }}
           REPO_NAME: ${{ github.event.repository.name }}
           TAG_NAME: ${{ github.ref_name }}
-          RELEASE_URL: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}
-          DOWNLOAD_URL: https://github.com/${{ github.repository }}/releases/latest
-          DISCORD_WEBHOOK: ${{ secrets.WEBHOOK }}
+          ZIP_URL: https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/${{ github.event.repository.name }}.zip
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
+          set -e
+
+          echo "CHANGELOG length: ${#CHANGELOG}"
+          echo "REPO_NAME: $REPO_NAME"
+          echo "TAG_NAME: $TAG_NAME"
+
+          CHANGELOG_TRIMMED=$(echo "$CHANGELOG" | cut -c1-3500)
+
           PAYLOAD=$(jq -n \
             --arg repo "$REPO_NAME" \
             --arg tag "$TAG_NAME" \
             --arg changelog "$CHANGELOG_TRIMMED" \
-            --arg download_url "$DOWNLOAD_URL" \
+            --arg zip_url "$ZIP_URL" \
             --arg doc_url "https://docs.re-cord.dev/" \
             '{
               flags: 32768,
@@ -131,7 +138,7 @@ jobs:
                     {
                       type: 1,
                       components: [
-                        { type: 2, style: 5, label: "Download", url: $download_url },
+                        { type: 2, style: 5, label: "Download", url: $zip_url },
                         { type: 2, style: 5, label: "Document", url: $doc_url }
                       ]
                     }
@@ -140,8 +147,17 @@ jobs:
               ]
             }')
 
-          curl -H "Content-Type: application/json" \
+          # jqがエラーを吐いていないか確認
+          echo "jq exit code: $?"
+          echo "PAYLOAD length: ${#PAYLOAD}"
+
+          # JSONとして妥当か検証(ここで落ちたらjqのフィルタ自体かデータが原因)
+          echo "$PAYLOAD" | jq . > /dev/null
+
+          # 実際に送る中身を確認(webhook URLは映らないので安全)
+          echo "$PAYLOAD"
+
+          curl -s -H "Content-Type: application/json" \
                -X POST \
                -d "$PAYLOAD" \
                "$DISCORD_WEBHOOK?wait=true"
-        
