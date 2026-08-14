@@ -112,9 +112,6 @@ jobs:
           DOWNLOAD_URL: https://github.com/${{ github.repository }}/releases/latest
           DISCORD_WEBHOOK: ${{ secrets.WEBHOOK }}
         run: |
-          # text display は1ブロック4000文字制限があるのでトリム
-          CHANGELOG_TRIMMED=$(echo "$CHANGELOG" | cut -c1-3500)
-
           PAYLOAD=$(jq -n \
             --arg repo "$REPO_NAME" \
             --arg tag "$TAG_NAME" \
