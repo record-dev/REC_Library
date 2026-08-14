@@ -113,10 +113,12 @@ jobs:
         run: |
           set -e
 
-          echo "CHANGELOG length: ${#CHANGELOG}"
-          echo "REPO_NAME: $REPO_NAME"
-          echo "TAG_NAME: $TAG_NAME"
+          if [ -z "$DISCORD_WEBHOOK" ]; then
+            echo "::error::DISCORD_WEBHOOK is EMPTY. Secret 'DISCORD_WEBHOOK_URL' が未設定か名前が違います"
+            exit 1
+          fi
 
+          # text display は1ブロック4000文字制限があるのでトリム
           CHANGELOG_TRIMMED=$(echo "$CHANGELOG" | cut -c1-3500)
 
           PAYLOAD=$(jq -n \
@@ -147,17 +149,11 @@ jobs:
               ]
             }')
 
-          # jqがエラーを吐いていないか確認
-          echo "jq exit code: $?"
-          echo "PAYLOAD length: ${#PAYLOAD}"
-
-          # JSONとして妥当か検証(ここで落ちたらjqのフィルタ自体かデータが原因)
+          # JSONとして妥当か検証
           echo "$PAYLOAD" | jq . > /dev/null
 
-          # 実際に送る中身を確認(webhook URLは映らないので安全)
-          echo "$PAYLOAD"
-
-          curl -s -H "Content-Type: application/json" \
+          curl -s -w "\nHTTP_STATUS:%{http_code}\n" \
+               -H "Content-Type: application/json" \
                -X POST \
                -d "$PAYLOAD" \
-               "$DISCORD_WEBHOOK?wait=true"
+               "$DISCORD_WEBHOOK?wait=true&with_components=true"
