@@ -45,6 +45,9 @@ jobs:
           git pull --rebase origin main
           git push origin HEAD:main
 
+          git fetch origin main
+          git checkout FETCH_HEAD
+
       - name: Build distribution folder
         run: |
           # リポジトリ名を自動取得して変数にする
