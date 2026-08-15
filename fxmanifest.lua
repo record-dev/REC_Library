@@ -11,7 +11,7 @@
 
 fx_version 'cerulean'
 game 'gta5'
-version 'v1.0.8.1'
+version '1.0.9.0'
 lua54 'yes'
 
 author 'Ⓒ RE:CORD | @Nazu'
