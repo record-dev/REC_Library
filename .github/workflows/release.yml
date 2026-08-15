@@ -25,6 +25,7 @@ jobs:
       - name: Update fxmanifest.lua version
         run: |
           NEW_VERSION=${{ github.ref_name }}
+          NEW_VERSION=${NEW_VERSION#v}
           sed -i "s/^version\s\+['\"].*['\"]/version '$NEW_VERSION'/g" fxmanifest.lua
 
       - name: Get GitHub App user info
