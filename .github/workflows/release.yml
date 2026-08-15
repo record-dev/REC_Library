@@ -49,6 +49,9 @@ jobs:
           git fetch origin main
           git checkout FETCH_HEAD
 
+          git tag -f ${{ github.ref_name }} HEAD
+          git push origin ${{ github.ref_name }} --force
+
       - name: Build distribution folder
         run: |
           # リポジトリ名を自動取得して変数にする
