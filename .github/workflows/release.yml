@@ -35,23 +35,6 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
-      - name: Commit and Push changes
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-        run: |
-          git config --local user.name "${{ steps.app-token.outputs.app-slug }}[bot]"
-          git config --local user.email "${{ steps.app-user.outputs.id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
-          git add fxmanifest.lua
-          git commit -m "chore: bump version to ${{ github.ref_name }}"
-          git pull --rebase origin main
-          git push origin HEAD:main
-
-          git fetch origin main
-          git checkout FETCH_HEAD
-
-          git tag -f ${{ github.ref_name }} HEAD
-          git push origin ${{ github.ref_name }} --force
-
       - name: Build distribution folder
         run: |
           # リポジトリ名を自動取得して変数にする
