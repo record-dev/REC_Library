@@ -125,6 +125,9 @@ jobs:
             exit 1
           fi
 
+          # doc_url用にリポジトリ名を小文字化
+          REPO_NAME_LOWER="${REPO_NAME,,}"
+
           # text display は1ブロック4000文字制限があるのでトリム
           CHANGELOG_TRIMMED=$(echo "$CHANGELOG" | cut -c1-3500)
 
@@ -133,7 +136,7 @@ jobs:
             --arg tag "$TAG_NAME" \
             --arg changelog "$CHANGELOG_TRIMMED" \
             --arg latest_url "$LATEST_URL" \
-            --arg doc_url "https://docs.re-cord.dev/" \
+            --arg doc_url "https://docs.re-cord.dev/en/common-dependencies/$REPO_NAME_LOWER" \
             '{
               flags: 32768,
               components: [
