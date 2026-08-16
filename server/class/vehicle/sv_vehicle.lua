@@ -2,6 +2,7 @@
 ---@type REC_Library.Server.Utils
 local utils = require "@REC_Library.server.sv_utils"
 
+---@type REC_Library.Shared.Config
 local sharedLibConfig = require "@REC_Library.shared.sh_config"
 
 ---@class REC_Library.Server.Class.Vehicle.Vehicle
