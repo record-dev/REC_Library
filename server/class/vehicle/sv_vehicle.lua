@@ -96,7 +96,7 @@ function Vehicle:spawn(vehType)
         )
     else
 
-        local searchModel = sharedLibConfig.framework == "qbox" and info.model or info.modelHash
+        local searchModel = sharedLibConfig.framework == "qbx" and info.model or info.modelHash
 
         -- If the type is easy
         if vehType ~= nil then

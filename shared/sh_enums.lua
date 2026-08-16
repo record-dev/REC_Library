@@ -12,7 +12,7 @@ enums.Languages = {
 ---@enum REC_Library.Shared.Enums.Framework
 enums.FrameworkTypes = {
     ox = "ox",
-    qbox = "qbox",
+    qbx = "qbx",
     esx = "esx",
     qb = "qb",
     custom = "custom",
