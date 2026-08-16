@@ -158,12 +158,12 @@ config.resources = {
 ---]]
 config.events = {
     onPlayerLoaded = {
-        qbox    = "QBCore:Client:OnPlayerLoaded",
+        qbx    = "QBCore:Client:OnPlayerLoaded",
         esx     = "esx:playerLoaded",
         qb      = "QBCore:Client:OnPlayerLoaded",
     },
     onPlayerLogOuted = {
-        qbox    = "qbx_core:client:playerLoggedOut",
+        qbx    = "qbx_core:client:playerLoggedOut",
         esx     = "esx:playerLogout",
         qb      = "QBCore:Client:OnPlayerUnload",
     },
