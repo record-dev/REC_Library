@@ -91,6 +91,7 @@ enums.DispatchTypes = {
 
 ---@enum REC_Library.Shared.Enums.Notify
 enums.NotifyTypes = {
+    rec = "rec",
     ox = "ox",
     okok = "okok",
     custom = "custom",
