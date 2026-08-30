@@ -61,6 +61,12 @@ local api = {
             PlayerConfigBuilder = require "@REC_Library.server.class.player.sv_playerConfigBuilder",
         },
 
+        ---@class REC_Library.Server.API.Class.Web
+        ---@field WebAuth REC_Library.Server.Class.WebAuth
+        Web = {
+            WebAuth = require "@REC_Library.server.sv_webAuth",
+        },
+
         ---@class REC_Library.Server.API.Class.Vehicle
         ---@field Vehicle REC_Library.Server.Class.Vehicle.Vehicle
         Vehicle = {
