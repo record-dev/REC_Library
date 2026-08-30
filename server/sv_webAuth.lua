@@ -454,6 +454,37 @@ function WebAuth:localToken(label, scopes)
 end
 
 ---[[
+---     The same token with every write dropped
+---     Resources with their own in-game read / write split (an "editor" ACE group,
+---     say) narrow the panel's scopes with this rather than by hand, so a viewer
+---     never reports a write permission the server would refuse.
+---]]
+---@param tokenInfo REC_Library.Server.Class.WebAuth.Token
+---@return REC_Library.Server.Class.WebAuth.Token
+function WebAuth:readOnly(tokenInfo)
+
+    ---@type string[]
+    local normalizedScopes = {}
+
+    for _, granted in ipairs(tokenInfo.normalizedScopes) do
+        local area, action = splitScope(granted)
+        if action == "read" or action == "*" then
+            normalizedScopes[#normalizedScopes+1] = area .. ":read"
+        end
+    end
+
+    ---@type REC_Library.Server.Class.WebAuth.Token
+    return {
+        token = tokenInfo.token,
+        label = tokenInfo.label,
+        scopes = normalizedScopes,
+        normalizedScopes = normalizedScopes,
+        enabled = tokenInfo.enabled,
+        expiresAt = tokenInfo.expiresAt,
+    }
+end
+
+---[[
 ---     The scopes as the UI needs them: what the caller may actually do
 ---     `areas` is the resource's own list, so the panel can grey out what is denied.
 ---]]
