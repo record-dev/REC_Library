@@ -58,12 +58,6 @@ local api = {
             ParticleConfigBuilder = require "@REC_Library.shared.class.effect.sh_particleConfigBuilder",
             SoundConfigBuilder = require "@REC_Library.shared.class.effect.sh_soundConfigBuilder",
         },
-
-        ---@class REC_Library.Shared.Class.Web
-        ---@field WebConfig REC_Library.Shared.Class.Web.WebConfig
-        Web = {
-            WebConfig = require "@REC_Library.shared.class.web.sh_webConfig",
-        },
     },
 
     ---@type table<string, REC_Library.Shared.Animation>

@@ -3,24 +3,35 @@
 ---     Shared defaults for the REC_* admin panel browser route
 ---     https://docs.re-cord.dev/en/resources/rec_library/web-config
 ---]]
----@class REC_Library.Shared.Class.Web.WebConfig
+---@class REC_Library.Server.Class.Web.WebConfig
 local webConfig = {}
 
----@type string
-local SHARED_PREFIX = "REC"
+---[[
+---     Every default below lives in server/sv_config.lua, so one edit there moves
+---     every REC_* panel at once
+---]]
+---@type REC_Library.Server.Config
+local svCfg = require "@REC_Library.server.sv_config"
+local defaults = svCfg.webDefaults
 
----@type string[]
-local LOOPBACK_ADDRESSES = {
-    "127.0.0.0/8",
-    "::1",
-}
+---[[
+---     Copy a default list before it leaves this file
+---     Handing the shared table out would let one resource's config edit reach every
+---     other panel, which is the one thing a default must not do.
+---]]
+---@param entries string[]
+---@return string[]
+local function copyList(entries)
 
----@type string[]
-local PRIVATE_ADDRESSES = {
-    "192.168.1.0/24",   -- LAN
-    "172.16.0.0/12",    -- Docker
-    "100.64.0.0/10",    -- Tailscale (CGNAT range)
-}
+    ---@type string[]
+    local copy = {}
+
+    for index, entry in ipairs(entries) do
+        copy[index] = entry
+    end
+
+    return copy
+end
 
 ---[[
 ---     Read a convar, preferring the one named after this resource
@@ -37,7 +48,7 @@ local function convar(name)
         return own
     end
 
-    return GetConvar(("%s:%s"):format(SHARED_PREFIX, name), "")
+    return GetConvar(("%s:%s"):format(svCfg.convarPrefix, name), "")
 end
 
 ---[[
@@ -79,7 +90,7 @@ local function buildAllowedAddresses(debugMode)
     ---@type string[]
     local addresses = {}
 
-    for _, entry in ipairs(LOOPBACK_ADDRESSES) do
+    for _, entry in ipairs(defaults.loopbackAddresses) do
         addresses[#addresses+1] = entry
     end
 
@@ -97,7 +108,7 @@ local function buildAllowedAddresses(debugMode)
         return addresses
     end
 
-    for _, entry in ipairs(PRIVATE_ADDRESSES) do
+    for _, entry in ipairs(defaults.privateAddresses) do
         addresses[#addresses+1] = entry
     end
 
@@ -111,20 +122,25 @@ end
 ---@return table<string, REC_Library.Server.Class.Web.WebAuth.ConfigToken>
 local function buildTokens()
 
-    return {
-        [convar("adminToken")] = {
-            label = "admin",
-            scopes = {
-                "*",
-            },
-        },
-        [convar("supportToken")] = {
-            label = "support",
-            scopes = {
-                "read",
-            },
-        },
-    }
+    ---@type table<string, REC_Library.Server.Class.Web.WebAuth.ConfigToken>
+    local tokens = {}
+
+    for _, entry in ipairs(defaults.tokens) do
+
+        ---@type string
+        local token = convar(entry.convar)
+
+        -- an unset convar would key every entry on "", so only the last one would
+        -- survive the table. WebAuth drops it too, this keeps the count honest
+        if token ~= "" then
+            tokens[token] = {
+                label = entry.label,
+                scopes = copyList(entry.scopes),
+            }
+        end
+    end
+
+    return tokens
 end
 
 ---[[
@@ -138,7 +154,7 @@ end
 ---     Nothing to type wrong here: no scope syntax lives in a .cfg file, an unset
 ---     convar just means that named token does not exist yet.
 ---]]
----@param customTokens? REC_Library.Shared.Class.Web.WebConfig.CustomToken[]
+---@param customTokens? REC_Library.Server.Class.Web.WebConfig.CustomToken[]
 ---@return table<string, REC_Library.Server.Class.Web.WebAuth.ConfigToken>
 local function buildCustomTokens(customTokens)
 
@@ -152,7 +168,7 @@ local function buildCustomTokens(customTokens)
         end
 
         ---@type string
-        local token = convar("token:" .. entry.name)
+        local token = convar(defaults.customTokenPrefix .. entry.name)
 
         if token ~= "" then
             extra[token] = {
@@ -179,18 +195,16 @@ end
 ---     Build config.web from the shared defaults, overrides.http merged key by key
 ---]]
 ---@param debugMode boolean
----@param overrides REC_Library.Shared.Class.Web.WebConfig.Overrides
----@return REC_Library.Shared.Class.Web.WebConfig.Result
+---@param overrides REC_Library.Server.Class.Web.WebConfig.Overrides
+---@return REC_Library.Server.Class.Web.WebConfig.Result
 function webConfig:build(debugMode, overrides)
 
     assert(type(overrides) == "table", "overrides must be a table")
     assert(type(overrides.areas) == "table", "overrides.areas must be a string[]")
 
-    ---@type REC_Library.Shared.Class.Web.WebConfig.Result
+    ---@type REC_Library.Server.Class.Web.WebConfig.Result
     local web = {
-        inGameScopes = {
-            "*",
-        },
+        inGameScopes = copyList(defaults.inGameScopes),
     }
 
     for key, value in pairs(overrides) do
@@ -200,9 +214,9 @@ function webConfig:build(debugMode, overrides)
     end
 
     web.http = {
-        enabled = false,
+        enabled = defaults.httpEnabled,
         tokens = buildTokens(),
-        distDir = "web/build",
+        distDir = defaults.distDir,
         allowedAddresses = buildAllowedAddresses(debugMode),
         trustedProxies = buildTrustedProxies(),
     }
@@ -223,36 +237,36 @@ end
 
 return webConfig
 
----@class REC_Library.Shared.Class.Web.WebConfig.Http
+---@class REC_Library.Server.Class.Web.WebConfig.Http
 ---@field enabled boolean
 ---@field tokens table<string, REC_Library.Server.Class.Web.WebAuth.ConfigToken>
 ---@field distDir string
 ---@field allowedAddresses string[]
 ---@field trustedProxies string[]
 
----@class REC_Library.Shared.Class.Web.WebConfig.Overrides
+---@class REC_Library.Server.Class.Web.WebConfig.Overrides
 ---@field areas string[] permission areas this resource understands
 ---@field inGameScopes? string[] scopes the in-game panel runs with
----@field http? REC_Library.Shared.Class.Web.WebConfig.Http.Overrides merged over the defaults key by key
+---@field http? REC_Library.Server.Class.Web.WebConfig.Http.Overrides merged over the defaults key by key
 ---@field [string] any anything else is copied onto config.web as is
 
 ---[[
 ---     Every http default a resource may replace, what is left out keeps the shared default
 ---]]
----@class REC_Library.Shared.Class.Web.WebConfig.Http.Overrides
+---@class REC_Library.Server.Class.Web.WebConfig.Http.Overrides
 ---@field enabled? boolean false keeps the browser route off, which is the shipped default
 ---@field tokens? table<string, REC_Library.Server.Class.Web.WebAuth.ConfigToken> replaces the convar pair entirely
----@field customTokens? REC_Library.Shared.Class.Web.WebConfig.CustomToken[] named tokens on top of admin/support, each reads its value from its own convar
+---@field customTokens? REC_Library.Server.Class.Web.WebConfig.CustomToken[] named tokens on top of admin/support, each reads its value from its own convar
 ---@field distDir? string where the built panel lives, relative to the resource
 ---@field allowedAddresses? string[] IPv4 CIDR or a literal address, anything else gets 404
 ---@field trustedProxies? string[] addresses allowed to front the route, they must enforce their own access control
 
----@class REC_Library.Shared.Class.Web.WebConfig.CustomToken
+---@class REC_Library.Server.Class.Web.WebConfig.CustomToken
 ---@field name string convar suffix (token:<name>), also the token's label unless label is set
 ---@field scopes string[] "economy:read", a bare area, "read"/"write", or "*"
 ---@field label? string shown in the panel and the change log instead of name
 
----@class REC_Library.Shared.Class.Web.WebConfig.Result
+---@class REC_Library.Server.Class.Web.WebConfig.Result
 ---@field areas string[]
 ---@field inGameScopes string[]
----@field http REC_Library.Shared.Class.Web.WebConfig.Http
+---@field http REC_Library.Server.Class.Web.WebConfig.Http

@@ -61,16 +61,6 @@ local api = {
             PlayerConfigBuilder = require "@REC_Library.server.class.player.sv_playerConfigBuilder",
         },
 
-        ---@class REC_Library.Server.API.Class.Web
-        ---@field WebAuth REC_Library.Server.Class.Web.WebAuth
-        ---@field WebConfigStore REC_Library.Server.Class.Web.WebConfigStore
-        ---@field WebSettingConfigBuilder REC_Library.Server.Class.Web.WebSettingConfigBuilder
-        Web = {
-            WebAuth = require "@REC_Library.server.class.web.sv_webAuth",
-            WebConfigStore = require "@REC_Library.server.class.web.sv_webConfigStore",
-            WebSettingConfigBuilder = require "@REC_Library.server.class.web.sv_webSettingConfigBuilder",
-        },
-
         ---@class REC_Library.Server.API.Class.Vehicle
         ---@field Vehicle REC_Library.Server.Class.Vehicle.Vehicle
         Vehicle = {
@@ -81,6 +71,26 @@ local api = {
             Skylift = {
                 Skylift = require "@REC_Library.server.class.vehicle.skylift.sv_skylift",
             },
+        },
+
+        ---@class REC_Library.Server.API.Class.Staff
+        ---@field Staff REC_Library.Server.Class.Staff.Staff
+        ---@field StaffConfig REC_Library.Server.Class.Staff.StaffConfig
+        Staff = {
+            Staff = require "@REC_Library.server.class.staff.sv_staff",
+            StaffConfig = require "@REC_Library.server.class.staff.sv_staffConfig",
+        },
+
+        ---@class REC_Library.Server.API.Class.Web
+        ---@field WebAuth REC_Library.Server.Class.Web.WebAuth
+        ---@field WebConfig REC_Library.Server.Class.Web.WebConfig
+        ---@field WebConfigStore REC_Library.Server.Class.Web.WebConfigStore
+        ---@field WebSettingConfigBuilder REC_Library.Server.Class.Web.WebSettingConfigBuilder
+        Web = {
+            WebAuth = require "@REC_Library.server.class.web.sv_webAuth",
+            WebConfig = require "@REC_Library.server.class.web.sv_webConfig",
+            WebConfigStore = require "@REC_Library.server.class.web.sv_webConfigStore",
+            WebSettingConfigBuilder = require "@REC_Library.server.class.web.sv_webSettingConfigBuilder",
         },
     },
 }
