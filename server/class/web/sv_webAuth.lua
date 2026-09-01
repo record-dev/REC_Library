@@ -3,27 +3,7 @@ local utils = require "@REC_Library.server.sv_utils"
 
 ---[[
 ---     Shared browser-route auth for the REC_* admin panels
----
----     Every resource used to carry its own copy of "one convar token + an address
----     allowlist". That single token could not tell a read-only viewer from someone
----     allowed to press the destructive buttons, so this module replaces it with a
----     token table where each entry carries its own scopes:
----
----         config.web.http.tokens = {
----             ["32+ random characters"] = {
----                 label  = "owner",
----                 scopes = { "*", },
----             },
----             ["another 32+ characters"] = {
----                 label  = "support",
----                 scopes = { "read", },
----             },
----         }
----
----     A scope is "<area>:<action>". The two shorthands "read" and "write" expand to
----     "*:read" / "*:write", so the common "this token may look but not touch" case
----     stays one word. Areas are per resource (heists, locations, entities, ...), the
----     actions are always read / write.
+---     Each token in config.web.http.tokens carries its own "<area>:<action>" scopes
 ---]]
 
 ---@type integer
@@ -179,7 +159,7 @@ local function splitScope(scope)
     return area, action
 end
 
----@class REC_Library.Server.Class.WebAuth.Token
+---@class REC_Library.Server.Class.Web.WebAuth.Token
 ---@field token string
 ---@field label string
 ---@field scopes string[] as written in the config
@@ -187,14 +167,14 @@ end
 ---@field enabled boolean
 ---@field expiresAt integer|nil unix time, nil never expires
 
----@class REC_Library.Server.Class.WebAuth.Config
+---@class REC_Library.Server.Class.Web.WebAuth.Config
 ---@field resourceName string
----@field tokens table<string, REC_Library.Server.Class.WebAuth.ConfigToken>|nil
+---@field tokens table<string, REC_Library.Server.Class.Web.WebAuth.ConfigToken>|nil
 ---@field allowedAddresses string[]|nil
 ---@field trustedProxies string[]|nil
 ---@field debug boolean|nil
 
----@class REC_Library.Server.Class.WebAuth.ConfigToken
+---@class REC_Library.Server.Class.Web.WebAuth.ConfigToken
 ---@field label? string
 ---@field scopes? string[]
 ---@field enabled? boolean
@@ -203,9 +183,9 @@ end
 ---[[
 ---     Browser-route auth for one resource
 ---]]
----@class REC_Library.Server.Class.WebAuth
+---@class REC_Library.Server.Class.Web.WebAuth
 ---@field resourceName string
----@field tokens table<string, REC_Library.Server.Class.WebAuth.Token>
+---@field tokens table<string, REC_Library.Server.Class.Web.WebAuth.Token>
 ---@field allowedAddresses string[]
 ---@field trustedProxies string[]
 ---@field debug boolean
@@ -213,8 +193,8 @@ local WebAuth = {}
 WebAuth.__index = WebAuth
 
 ---instantiation
----@param config REC_Library.Server.Class.WebAuth.Config
----@return REC_Library.Server.Class.WebAuth
+---@param config REC_Library.Server.Class.Web.WebAuth.Config
+---@return REC_Library.Server.Class.Web.WebAuth
 function WebAuth:new(config)
     local instance = setmetatable({}, self)
 
@@ -230,10 +210,9 @@ function WebAuth:new(config)
 end
 
 ---[[
----     Replace the token table (also used at boot)
----     Entries with an unusable token are dropped rather than half accepted.
+---     Replace the token table, dropping entries with an unusable token
 ---]]
----@param tokens table<string, REC_Library.Server.Class.WebAuth.ConfigToken>|nil
+---@param tokens table<string, REC_Library.Server.Class.Web.WebAuth.ConfigToken>|nil
 ---@return integer count of usable tokens
 function WebAuth:setTokens(tokens)
 
@@ -295,7 +274,7 @@ function WebAuth:hasTokens()
     return false
 end
 
----@param tokenInfo REC_Library.Server.Class.WebAuth.Token
+---@param tokenInfo REC_Library.Server.Class.Web.WebAuth.Token
 ---@return boolean
 function WebAuth:isUsable(tokenInfo)
 
@@ -367,7 +346,7 @@ end
 ---     Resolve a request to the token that signed it
 ---]]
 ---@param headers table<string, string>|nil
----@return REC_Library.Server.Class.WebAuth.Token|nil
+---@return REC_Library.Server.Class.Web.WebAuth.Token|nil
 function WebAuth:resolve(headers)
 
     local token = self:readBearer(headers)
@@ -384,11 +363,9 @@ function WebAuth:resolve(headers)
 end
 
 ---[[
----     Whether a token may perform "<area>:<action>"
----     "*" as either half of a granted scope is a wildcard, so "read" (= "*:read")
----     covers every area and "heists:*" covers both actions of that one area.
+---     Whether a token may perform "<area>:<action>", "*" as either half is a wildcard
 ---]]
----@param tokenInfo REC_Library.Server.Class.WebAuth.Token|nil
+---@param tokenInfo REC_Library.Server.Class.Web.WebAuth.Token|nil
 ---@param required string
 ---@return boolean
 function WebAuth:hasScope(tokenInfo, required)
@@ -424,13 +401,11 @@ function WebAuth:hasScope(tokenInfo, required)
 end
 
 ---[[
----     Build a token that is not in the table
----     The in-game panel authenticates through the ACE / job check instead of a bearer
----     token, so it needs a token object to carry the scopes it then runs with.
+---     Build a token that is not in the table, for the ACE / job authenticated in-game panel
 ---]]
 ---@param label string
 ---@param scopes string[]|nil nil means full access
----@return REC_Library.Server.Class.WebAuth.Token
+---@return REC_Library.Server.Class.Web.WebAuth.Token
 function WebAuth:localToken(label, scopes)
 
     ---@type string[]
@@ -442,7 +417,7 @@ function WebAuth:localToken(label, scopes)
         end
     end
 
-    ---@type REC_Library.Server.Class.WebAuth.Token
+    ---@type REC_Library.Server.Class.Web.WebAuth.Token
     return {
         token = "",
         label = label,
@@ -455,12 +430,9 @@ end
 
 ---[[
 ---     The same token with every write dropped
----     Resources with their own in-game read / write split (an "editor" ACE group,
----     say) narrow the panel's scopes with this rather than by hand, so a viewer
----     never reports a write permission the server would refuse.
 ---]]
----@param tokenInfo REC_Library.Server.Class.WebAuth.Token
----@return REC_Library.Server.Class.WebAuth.Token
+---@param tokenInfo REC_Library.Server.Class.Web.WebAuth.Token
+---@return REC_Library.Server.Class.Web.WebAuth.Token
 function WebAuth:readOnly(tokenInfo)
 
     ---@type string[]
@@ -473,7 +445,7 @@ function WebAuth:readOnly(tokenInfo)
         end
     end
 
-    ---@type REC_Library.Server.Class.WebAuth.Token
+    ---@type REC_Library.Server.Class.Web.WebAuth.Token
     return {
         token = tokenInfo.token,
         label = tokenInfo.label,
@@ -486,11 +458,10 @@ end
 
 ---[[
 ---     The scopes as the UI needs them: what the caller may actually do
----     `areas` is the resource's own list, so the panel can grey out what is denied.
 ---]]
----@param tokenInfo REC_Library.Server.Class.WebAuth.Token|nil
+---@param tokenInfo REC_Library.Server.Class.Web.WebAuth.Token|nil
 ---@param areas string[]
----@return REC_Library.Server.Class.WebAuth.Session
+---@return REC_Library.Server.Class.Web.WebAuth.Session
 function WebAuth:toSession(tokenInfo, areas)
 
     ---@type table<string, boolean>
@@ -501,7 +472,7 @@ function WebAuth:toSession(tokenInfo, areas)
         permissions[area .. ":write"] = self:hasScope(tokenInfo, area .. ":write")
     end
 
-    ---@type REC_Library.Server.Class.WebAuth.Session
+    ---@type REC_Library.Server.Class.Web.WebAuth.Session
     return {
         label = tokenInfo ~= nil and tokenInfo.label or "anonymous",
         scopes = tokenInfo ~= nil and tokenInfo.normalizedScopes or {},
@@ -550,7 +521,7 @@ function WebAuth:debugPrint(...)
     end
 end
 
----@class REC_Library.Server.Class.WebAuth.Session
+---@class REC_Library.Server.Class.Web.WebAuth.Session
 ---@field label string
 ---@field scopes string[]
 ---@field permissions table<string, boolean> "<area>:<action>" -> allowed

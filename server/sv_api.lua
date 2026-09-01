@@ -62,9 +62,13 @@ local api = {
         },
 
         ---@class REC_Library.Server.API.Class.Web
-        ---@field WebAuth REC_Library.Server.Class.WebAuth
+        ---@field WebAuth REC_Library.Server.Class.Web.WebAuth
+        ---@field WebConfigStore REC_Library.Server.Class.Web.WebConfigStore
+        ---@field WebSettingConfigBuilder REC_Library.Server.Class.Web.WebSettingConfigBuilder
         Web = {
-            WebAuth = require "@REC_Library.server.sv_webAuth",
+            WebAuth = require "@REC_Library.server.class.web.sv_webAuth",
+            WebConfigStore = require "@REC_Library.server.class.web.sv_webConfigStore",
+            WebSettingConfigBuilder = require "@REC_Library.server.class.web.sv_webSettingConfigBuilder",
         },
 
         ---@class REC_Library.Server.API.Class.Vehicle
