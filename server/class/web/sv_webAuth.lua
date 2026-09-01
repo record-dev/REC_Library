@@ -429,6 +429,92 @@ function WebAuth:localToken(label, scopes)
 end
 
 ---[[
+---     Longest label kept, the audit columns are varchar(64)
+---]]
+---@type integer
+local MAX_LABEL_LENGTH = 64
+
+---[[
+---     Does this player satisfy every condition the grant names
+---]]
+---@param src integer
+---@param grant REC_Library.Server.Class.Web.WebConfig.Grant
+---@param hasJob? fun(src: integer, job: string, ranks?: integer[], onDutyOnly?: boolean): boolean
+---@return boolean
+local function grantMatches(src, grant, hasJob)
+
+    if type(grant.ace) == "string" and IsPlayerAceAllowed(tostring(src), grant.ace) ~= 1 then
+        return false
+    end
+
+    if type(grant.job) == "string" then
+
+        -- the framework adapter lives in REC_Utils, which this library does not depend
+        -- on, so the caller passes the check in. Without one a job grant cannot match
+        if hasJob == nil then
+            return false
+        end
+
+        if hasJob(src, grant.job, grant.ranks, grant.onDutyOnly) ~= true then
+            return false
+        end
+    end
+
+    return true
+end
+
+---[[
+---     The token one player runs the in-game panel with
+---     Every grant that matches contributes its scopes, so holding two of them hands
+---     out the union. nil means nothing matched, which is the same answer as "not
+---     allowed in": the entry check and the scope list come from one declaration.
+---]]
+---@param src integer
+---@param grants REC_Library.Server.Class.Web.WebConfig.Grant[]|nil
+---@param hasJob? fun(src: integer, job: string, ranks?: integer[], onDutyOnly?: boolean): boolean
+---@return REC_Library.Server.Class.Web.WebAuth.Token|nil
+function WebAuth:resolveInGame(src, grants, hasJob)
+
+    if type(grants) ~= "table" then
+        return nil
+    end
+
+    ---@type string[]
+    local scopes = {}
+
+    ---@type string[]
+    local labels = {}
+
+    ---@type table<string, true>
+    local seen = {}
+
+    for _, grant in ipairs(grants) do
+
+        if grantMatches(src, grant, hasJob) == false then
+            goto continue
+        end
+
+        labels[#labels+1] = grant.label or grant.ace or grant.job
+
+        for _, scope in ipairs(grant.scopes) do
+            if seen[scope] == nil then
+                seen[scope] = true
+                scopes[#scopes+1] = scope
+            end
+        end
+
+        ::continue::
+    end
+
+    if #labels == 0 then
+        return nil
+    end
+
+    -- the label is what the audit trail records, so it names what let the player in
+    return self:localToken(("in-game:%s"):format(table.concat(labels, "+")):sub(1, MAX_LABEL_LENGTH), scopes)
+end
+
+---[[
 ---     The same token with every write dropped
 ---]]
 ---@param tokenInfo REC_Library.Server.Class.Web.WebAuth.Token

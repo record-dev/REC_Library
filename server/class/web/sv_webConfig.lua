@@ -192,6 +192,58 @@ local function buildTrustedProxies()
 end
 
 ---[[
+---     Drop the grant entries that could never match, and keep the rest as declared
+---     A grant names a principal (an ACE, a job, or both, in which case both have to
+---     match) and the scopes it hands out. Nothing is normalized into scopes here:
+---     WebAuth does that, so a scope written one way in a grant and another way in a
+---     token cannot end up meaning different things.
+---]]
+---@param grants any
+---@return REC_Library.Server.Class.Web.WebConfig.Grant[]|nil nil when none were declared
+local function buildGrants(grants)
+
+    if type(grants) ~= "table" then
+        return nil
+    end
+
+    ---@type REC_Library.Server.Class.Web.WebConfig.Grant[]
+    local result = {}
+
+    for index, grant in ipairs(grants) do
+
+        if type(grant) ~= "table" then
+            print(("^3[%s] web.grants[%d] is not a table and was dropped^0"):format(GetCurrentResourceName(), index))
+            goto continue
+        end
+
+        if type(grant.ace) ~= "string" and type(grant.job) ~= "string" then
+            print(("^3[%s] web.grants[%d] names neither an ace nor a job and was dropped^0"):format(GetCurrentResourceName(), index))
+            goto continue
+        end
+
+        if type(grant.scopes) ~= "table" then
+            print(("^3[%s] web.grants[%d] has no scopes and was dropped^0"):format(GetCurrentResourceName(), index))
+            goto continue
+        end
+
+        result[#result+1] = {
+            ace = grant.ace,
+            job = grant.job,
+            ranks = grant.ranks,
+            onDutyOnly = grant.onDutyOnly,
+            scopes = copyList(grant.scopes),
+            label = grant.label,
+        }
+
+        ::continue::
+    end
+
+    -- an empty table is a declaration that nobody gets in, which is not the same as
+    -- not declaring grants at all: only the latter falls back to the old aceGroups
+    return result
+end
+
+---[[
 ---     Build config.web from the shared defaults, overrides.http merged key by key
 ---]]
 ---@param debugMode boolean
@@ -208,10 +260,14 @@ function webConfig:build(debugMode, overrides)
     }
 
     for key, value in pairs(overrides) do
-        if key ~= "http" then
+        if key ~= "http" and key ~= "grants" then
             web[key] = value
         end
     end
+
+    -- nil rather than an empty table when undeclared, so the in-game path can tell
+    -- "no grants declared" (use the old aceGroups) from "grants deny everyone"
+    web.grants = buildGrants(overrides.grants)
 
     web.http = {
         enabled = defaults.httpEnabled,
@@ -246,7 +302,8 @@ return webConfig
 
 ---@class REC_Library.Server.Class.Web.WebConfig.Overrides
 ---@field areas string[] permission areas this resource understands
----@field inGameScopes? string[] scopes the in-game panel runs with
+---@field grants? REC_Library.Server.Class.Web.WebConfig.Grant[] who opens the in-game panel and with which scopes, leaving this out keeps the resource's own aceGroups
+---@field inGameScopes? string[] scopes the in-game panel runs with, ignored once grants is declared
 ---@field http? REC_Library.Server.Class.Web.WebConfig.Http.Overrides merged over the defaults key by key
 ---@field [string] any anything else is copied onto config.web as is
 
@@ -266,7 +323,23 @@ return webConfig
 ---@field scopes string[] "economy:read", a bare area, "read"/"write", or "*"
 ---@field label? string shown in the panel and the change log instead of name
 
+---[[
+---     One rule handing scopes to whoever matches it
+---     Every condition present has to match, so naming both an ace and a job means
+---     the player needs both. A player matching several grants gets the union of
+---     their scopes, which is why there is no deny form: to take something away,
+---     stop granting it.
+---]]
+---@class REC_Library.Server.Class.Web.WebConfig.Grant
+---@field ace? string ACE permission the player has to hold
+---@field job? string framework job the player has to have
+---@field ranks? integer[] job grades that count, nil means any of them
+---@field onDutyOnly? boolean the job only counts while the player is on duty
+---@field scopes string[] "economy:read", a bare area, "read"/"write", or "*"
+---@field label? string recorded in the audit trail instead of the ace or job name
+
 ---@class REC_Library.Server.Class.Web.WebConfig.Result
 ---@field areas string[]
+---@field grants REC_Library.Server.Class.Web.WebConfig.Grant[]|nil
 ---@field inGameScopes string[]
 ---@field http REC_Library.Server.Class.Web.WebConfig.Http
