@@ -25,15 +25,23 @@ config.convarPrefix = "REC"
 ---[[
 ---     Shared defaults for the admin panels
 ---     sv_webConfig builds each resource's config.web from these.
----
----     web.grants is deliberately not here. Undeclared it reads back nil, and nil is
----     what tells a resource to keep using its own aceGroups: a default would turn
----     every panel over to grants at once, without anyone editing the config that
----     says so. It belongs here once the last resource has migrated and the aceGroups
----     path is deleted, and it should be merged onto a resource's own list rather
----     than replaced, so declaring one narrow grant cannot drop the admin row.
 ---]]
 config.webDefaults = {
+
+    ---[[
+    ---     Who opens every REC_* panel, and what they may do once inside
+    ---     A resource adds its own narrower entries on top of these rather than
+    ---     replacing them, so naming one moderator grant in one panel can never drop
+    ---     the row that lets an admin back in.
+    ---
+    ---     Every entry that matches contributes its scopes, so someone holding two of
+    ---     them gets the union. There is no deny form: to take something away, stop
+    ---     granting it.
+    ---]]
+    ---@type REC_Library.Server.Class.Web.WebConfig.Grant[]
+    grants = {
+        { ace = "admin", scopes = { "*", }, },
+    },
 
     ---[[
     ---     Always allowed to reach the browser route
@@ -80,9 +88,6 @@ config.webDefaults = {
 
     ---@type boolean
     httpEnabled = false, -- the browser route is off until a resource turns it on
-
-    ---@type string[]
-    inGameScopes = { "*", }, -- what the in-game panel runs with, it is already ACE gated
 }
 
 ---[[

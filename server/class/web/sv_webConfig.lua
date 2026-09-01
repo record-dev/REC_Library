@@ -192,54 +192,74 @@ local function buildTrustedProxies()
 end
 
 ---[[
----     Drop the grant entries that could never match, and keep the rest as declared
+---     Build config.web.grants from the shared list plus this resource's own entries
+---
 ---     A grant names a principal (an ACE, a job, or both, in which case both have to
 ---     match) and the scopes it hands out. Nothing is normalized into scopes here:
 ---     WebAuth does that, so a scope written one way in a grant and another way in a
 ---     token cannot end up meaning different things.
+---
+---     A resource's entries are added on top rather than replacing the shared ones,
+---     for the same reason the staff list is: declaring one narrow grant must never
+---     silently drop the row that lets an admin in. Pass useSharedGrants false when a
+---     panel really has to stand alone.
 ---]]
----@param grants any
----@return REC_Library.Server.Class.Web.WebConfig.Grant[]|nil nil when none were declared
-local function buildGrants(grants)
-
-    if type(grants) ~= "table" then
-        return nil
-    end
+---@param grants any this resource's own entries
+---@param useSharedGrants any false leaves the shared list out
+---@return REC_Library.Server.Class.Web.WebConfig.Grant[]
+local function buildGrants(grants, useSharedGrants)
 
     ---@type REC_Library.Server.Class.Web.WebConfig.Grant[]
     local result = {}
 
-    for index, grant in ipairs(grants) do
+    ---@param entries any
+    ---@param origin string
+    local function add(entries, origin)
 
-        if type(grant) ~= "table" then
-            print(("^3[%s] web.grants[%d] is not a table and was dropped^0"):format(GetCurrentResourceName(), index))
-            goto continue
+        if type(entries) ~= "table" then
+            return
         end
 
-        if type(grant.ace) ~= "string" and type(grant.job) ~= "string" then
-            print(("^3[%s] web.grants[%d] names neither an ace nor a job and was dropped^0"):format(GetCurrentResourceName(), index))
-            goto continue
+        for index, grant in ipairs(entries) do
+
+            if type(grant) ~= "table" then
+                print(("^3[%s] %s grant %d is not a table and was dropped^0"):format(GetCurrentResourceName(), origin, index))
+                goto continue
+            end
+
+            if type(grant.ace) ~= "string" and type(grant.job) ~= "string" then
+                print(("^3[%s] %s grant %d names neither an ace nor a job and was dropped^0"):format(GetCurrentResourceName(), origin, index))
+                goto continue
+            end
+
+            if type(grant.scopes) ~= "table" then
+                print(("^3[%s] %s grant %d has no scopes and was dropped^0"):format(GetCurrentResourceName(), origin, index))
+                goto continue
+            end
+
+            result[#result+1] = {
+                ace = grant.ace,
+                job = grant.job,
+                ranks = grant.ranks,
+                onDutyOnly = grant.onDutyOnly,
+                scopes = copyList(grant.scopes),
+                label = grant.label,
+            }
+
+            ::continue::
         end
-
-        if type(grant.scopes) ~= "table" then
-            print(("^3[%s] web.grants[%d] has no scopes and was dropped^0"):format(GetCurrentResourceName(), index))
-            goto continue
-        end
-
-        result[#result+1] = {
-            ace = grant.ace,
-            job = grant.job,
-            ranks = grant.ranks,
-            onDutyOnly = grant.onDutyOnly,
-            scopes = copyList(grant.scopes),
-            label = grant.label,
-        }
-
-        ::continue::
     end
 
-    -- an empty table is a declaration that nobody gets in, which is not the same as
-    -- not declaring grants at all: only the latter falls back to the old aceGroups
+    if useSharedGrants ~= false then
+        add(defaults.grants, "shared")
+    end
+
+    add(grants, "resource")
+
+    if #result == 0 then
+        print(("^3[%s] no grant matched anything, nobody can open the in-game panel^0"):format(GetCurrentResourceName()))
+    end
+
     return result
 end
 
@@ -255,19 +275,15 @@ function webConfig:build(debugMode, overrides)
     assert(type(overrides.areas) == "table", "overrides.areas must be a string[]")
 
     ---@type REC_Library.Server.Class.Web.WebConfig.Result
-    local web = {
-        inGameScopes = copyList(defaults.inGameScopes),
-    }
+    local web = {}
 
     for key, value in pairs(overrides) do
-        if key ~= "http" and key ~= "grants" then
+        if key ~= "http" and key ~= "grants" and key ~= "useSharedGrants" then
             web[key] = value
         end
     end
 
-    -- nil rather than an empty table when undeclared, so the in-game path can tell
-    -- "no grants declared" (use the old aceGroups) from "grants deny everyone"
-    web.grants = buildGrants(overrides.grants)
+    web.grants = buildGrants(overrides.grants, overrides.useSharedGrants)
 
     web.http = {
         enabled = defaults.httpEnabled,
@@ -302,8 +318,8 @@ return webConfig
 
 ---@class REC_Library.Server.Class.Web.WebConfig.Overrides
 ---@field areas string[] permission areas this resource understands
----@field grants? REC_Library.Server.Class.Web.WebConfig.Grant[] who opens the in-game panel and with which scopes, leaving this out keeps the resource's own aceGroups
----@field inGameScopes? string[] scopes the in-game panel runs with, ignored once grants is declared
+---@field grants? REC_Library.Server.Class.Web.WebConfig.Grant[] added on top of the shared list rather than replacing it
+---@field useSharedGrants? boolean false leaves the shared list out, only grants above counts then
 ---@field http? REC_Library.Server.Class.Web.WebConfig.Http.Overrides merged over the defaults key by key
 ---@field [string] any anything else is copied onto config.web as is
 
@@ -333,13 +349,12 @@ return webConfig
 ---@class REC_Library.Server.Class.Web.WebConfig.Grant
 ---@field ace? string ACE permission the player has to hold
 ---@field job? string framework job the player has to have
----@field ranks? integer[] job grades that count, nil means any of them
+---@field ranks? table<integer, true> job grades that count, keyed by level. nil means any grade, and an empty table means none
 ---@field onDutyOnly? boolean the job only counts while the player is on duty
 ---@field scopes string[] "economy:read", a bare area, "read"/"write", or "*"
 ---@field label? string recorded in the audit trail instead of the ace or job name
 
 ---@class REC_Library.Server.Class.Web.WebConfig.Result
 ---@field areas string[]
----@field grants REC_Library.Server.Class.Web.WebConfig.Grant[]|nil
----@field inGameScopes string[]
+---@field grants REC_Library.Server.Class.Web.WebConfig.Grant[]
 ---@field http REC_Library.Server.Class.Web.WebConfig.Http

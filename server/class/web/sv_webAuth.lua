@@ -439,7 +439,7 @@ local MAX_LABEL_LENGTH = 64
 ---]]
 ---@param src integer
 ---@param grant REC_Library.Server.Class.Web.WebConfig.Grant
----@param hasJob? fun(src: integer, job: string, ranks?: integer[], onDutyOnly?: boolean): boolean
+---@param hasJob? fun(src: integer, job: string, ranks?: table<integer, true>, onDutyOnly?: boolean): boolean
 ---@return boolean
 local function grantMatches(src, grant, hasJob)
 
@@ -471,7 +471,7 @@ end
 ---]]
 ---@param src integer
 ---@param grants REC_Library.Server.Class.Web.WebConfig.Grant[]|nil
----@param hasJob? fun(src: integer, job: string, ranks?: integer[], onDutyOnly?: boolean): boolean
+---@param hasJob? fun(src: integer, job: string, ranks?: table<integer, true>, onDutyOnly?: boolean): boolean
 ---@return REC_Library.Server.Class.Web.WebAuth.Token|nil
 function WebAuth:resolveInGame(src, grants, hasJob)
 
@@ -512,6 +512,42 @@ function WebAuth:resolveInGame(src, grants, hasJob)
 
     -- the label is what the audit trail records, so it names what let the player in
     return self:localToken(("in-game:%s"):format(table.concat(labels, "+")):sub(1, MAX_LABEL_LENGTH), scopes)
+end
+
+---[[
+---     The ACE names out of a grant list, for lib.addCommand's restricted
+---     A command takes a flat list of permissions and cannot express a job, so a
+---     job only grant is not represented here: that matches what the command could
+---     check anyway, and the panel's own gate still answers for those players.
+---]]
+---@param grants REC_Library.Server.Class.Web.WebConfig.Grant[]|nil
+---@param requiredScope? string only the grants that hand this out, nil means all of them
+---@return string[]
+function WebAuth:aceGroups(grants, requiredScope)
+
+    ---@type string[]
+    local result = {}
+
+    ---@type table<string, true>
+    local seen = {}
+
+    for _, grant in ipairs(grants or {}) do
+
+        if type(grant.ace) ~= "string" or seen[grant.ace] ~= nil then
+            goto continue
+        end
+
+        if requiredScope ~= nil and self:hasScope(self:localToken(grant.ace, grant.scopes), requiredScope) == false then
+            goto continue
+        end
+
+        seen[grant.ace] = true
+        result[#result+1] = grant.ace
+
+        ::continue::
+    end
+
+    return result
 end
 
 ---[[
