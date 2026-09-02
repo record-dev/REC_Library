@@ -39,6 +39,7 @@ function Cutscene:play()
     -- Load cutscene
     if not self:requestCutscene(info.name) then
         utils:debugPrint("[Cutscene:play]: Failed to request cutscene with name " .. tostring(info.name))
+        info.isResolving = false
         return false
     end
 
@@ -91,6 +92,7 @@ function Cutscene:play()
 
         if streamPed == nil then
             utils:debugPrint("[Cutscene:play]: Failed to spawn streaming entity with name " .. tostring(entityName))
+            self:restore()
             return false
         end
 
@@ -123,15 +125,27 @@ function Cutscene:play()
     SetFollowPedCamViewMode(2)
 
     --Wait until the cutscene ends
-    if not Cutscene:awaitEnd() then
-       utils:debugPrint("[Cutscene:play]: awaitEnd error")
+    if not self:awaitEnd() then
+        utils:debugPrint("[Cutscene:play]: awaitEnd error")
+        self:restore()
         return false
     end
 
+    self:restore()
+
+    return true
+end
+
+---Undo the preparation play() did to the player
+---Runs on every exit path, so a cutscene that fails cannot leave the player
+---invisible, frozen and behind a black screen
+---@return boolean Completed?
+function Cutscene:restore()
+    local info = self.info
+
     -- Items generated during cutscene playback and clearing work
     if not self:destroy() then
-        utils:debugPrint("[Cutscene:play]: destroy error")
-        return false
+        utils:debugPrint("[Cutscene:restore]: destroy error")
     end
 
     -- Force perspective to third person
@@ -157,6 +171,11 @@ function Cutscene:play()
 
     -- Remove transparency
     SetEntityVisible(info.ped, true, false)
+
+    -- the screen must never be left dark
+    if IsScreenFadedOut() == true or IsScreenFadingOut() == true then
+        DoScreenFadeIn(info.fadeinDuration)
+    end
 
     -- lower flag in progress
     info.isResolving = false
@@ -220,23 +239,36 @@ function Cutscene:awaitEnd(timeout, fadeOutStartTime)
     local fadeTime = fadeOutStartTime or 2000
     local isFadeStarted = false
 
+    -- A cutscene takes a while to actually begin, so wall clock time runs ahead of
+    -- playback. The wall clock is only kept as a bound against a cutscene that hangs.
+    local safetyTimeout = duration + 30000
+
     -- Loop while cutscene is active
     while IsCutsceneActive() do
-        local elapsedTime = GetGameTimer() - startTime
-        local remainingTime = duration - elapsedTime
 
-        -- timeout check
-        if remainingTime <= 0 then
-            utils:debugPrint("Cutscene:awaitEnd - Timed out.")
-            return false
-        end
+        -- the playback clock is what decides how much is left
+        local remainingTime = duration - GetCutsceneTime()
 
         -- Fade out start check
         -- If the fade has not started yet and the remaining time is less than the fade start time
-        if not isFadeStarted and remainingTime <= fadeTime then
+        if duration > 0 and not isFadeStarted and remainingTime <= fadeTime then
             utils:debugPrint("Cutscene:awaitEnd - Starting fade out...")
             DoScreenFadeOut(fadeTime) -- Fade out over the same amount of time as the remaining time
             isFadeStarted = true      -- flag to avoid calling fade too many times
+        end
+
+        -- timeout check
+        if GetGameTimer() - startTime >= safetyTimeout then
+            utils:debugPrint("Cutscene:awaitEnd - Timed out.")
+
+            -- leaving the game in a cutscene would strand the caller, so end it here
+            StopCutsceneImmediately()
+
+            if isFadeStarted then
+                DoScreenFadeIn(500)
+            end
+
+            return false
         end
 
         Wait(100)
