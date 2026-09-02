@@ -10,8 +10,6 @@ local api = {
         ---@field EntityManagerConfigBuilder REC_Library.Server.Class.Manager.EntityManagerConfigBuilder
         ---@field HeartbeatManager  REC_Library.Server.Class.Manager.HeartbeatManager
         ---@field HeartbeatManagerConfigBuilder  REC_Library.Server.Class.Manager.HeartbeatManagerConfigBuilder
-        ---@field HeistManager REC_Library.Server.Class.Manager.HeistManager
-        ---@field HeistManagerConfigBuilder REC_Library.Server.Class.Manager.HeistManagerConfigBuilder
         ---@field OwnershipManager REC_Library.Server.Class.Manager.OwnershipManager
         ---@field OwnershipManagerConfigBuilder REC_Library.Server.Class.Manager.OwnershipManagerConfigBuilder
         ---@field PlayerManager REC_Library.Server.Class.Manager.PlayerManager
@@ -27,8 +25,6 @@ local api = {
             ServerManagerConfigBuilder = require "@REC_Library.server.class.manager.sv_serverManagerConfigBuilder",
             SequenceManager = require "@REC_Library.server.class.manager.sv_sequenceManager",
             SequenceManagerConfigBuilder = require "@REC_Library.server.class.manager.sv_sequenceManagerConfigBuilder",
-            HeistManager = require "@REC_Library.server.class.manager.sv_heistManager",
-            HeistManagerConfigBuilder = require "@REC_Library.server.class.manager.sv_heistManagerConfigBuilder",
             EntityManager = require "@REC_Library.server.class.manager.sv_entityManager",
             EntityManagerConfigBuilder = require "@REC_Library.server.class.manager.sv_entityManagerConfigBuilder",
             HeartbeatManager = require "@REC_Library.server.class.manager.sv_heartbeatManager",
