@@ -15,6 +15,7 @@ enums.FrameworkTypes = {
     qbx = "qbx",
     esx = "esx",
     qb = "qb",
+    rec = "rec",
     custom = "custom",
 }
 

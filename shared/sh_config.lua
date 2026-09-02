@@ -49,6 +49,8 @@ config.framework = getConfigValue({
     { resource = "qbx_core", value = "qbx" },
     { resource = "es_extended", value = "esx" },
     { resource = "qb-core", value = "qb" },
+    -- last on purpose: REC_Core stays dormant next to another core, so that core wins
+    { resource = "REC_Core", value = "rec" },
 })
 
 
@@ -162,11 +164,13 @@ config.events = {
         qbx    = "QBCore:Client:OnPlayerLoaded",
         esx     = "esx:playerLoaded",
         qb      = "QBCore:Client:OnPlayerLoaded",
+        rec     = "REC_Core:client:onPlayerLoaded",
     },
     onPlayerLogOuted = {
         qbx    = "qbx_core:client:playerLoggedOut",
         esx     = "esx:playerLogout",
         qb      = "QBCore:Client:OnPlayerUnload",
+        rec     = "REC_Core:client:onPlayerUnloaded",
     },
     onResourceStart = "onResourceStart",
     onResourceStop  = "onResourceStop"
