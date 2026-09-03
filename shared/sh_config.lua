@@ -139,7 +139,7 @@ config.dispatch = getConfigValue({
 ---]]
 ---@type REC_Library.Shared.Enums.Notify
 config.notify = getConfigValue({
-    { resource = "REC_Notify", value = "rec" },
+    { resource = "REC_Hud", value = "rec" },
     { resource = "okokNotify", value = "okok" },
     { resource = "ox_lib", value = "ox" },
 })
