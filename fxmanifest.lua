@@ -17,22 +17,39 @@ lua54 'yes'
 author 'Ⓒ RE:CORD | @Nazu'
 description 'Ⓒ RE:CORD Library'
 
-dependencies {
-    'ox_lib',
-}
-
 shared_script {
-    '@ox_lib/init.lua',
+    'init.lua',
     'shared/class/**/*.lua',
     'shared/*.lua',
 }
 
 client_scripts {
     'client/class/**/*.lua',
+    'client/ui/cl_notify.lua',
+    'client/ui/cl_alert.lua',
+    'client/ui/cl_input.lua',
+    'client/ui/cl_context.lua',
+    'client/ui/cl_progress.lua',
+    'client/ui/cl_textUI.lua',
     'client/*.lua'
 }
 
 server_scripts {
     'server/class/**/*.lua',
     'server/*.lua',
+}
+
+ui_page 'web/build/index.html'
+
+---[[
+---     init.lua and lib/ run inside the resources that load them, so every client
+---     has to be able to download them.
+---]]
+files {
+    'init.lua',
+    'lib/**/*.lua',
+    'client/ui/cl_nui.lua',
+    'locales/web/*.json',
+    'web/build/index.html',
+    'web/build/assets/*',
 }
