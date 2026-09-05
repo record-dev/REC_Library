@@ -179,3 +179,26 @@ RegisterCommand("monitorInterial", function ()
         interialIdMonitorThread = false
     end
 end, false)
+RegisterCommand("rl-helptext", function (_, args)
+    lib.showHelpText({
+        text     = { "~INPUT_CONTEXT~ Interact", "~INPUT_FRONTEND_CANCEL~ ~r~Cancel~s~", },
+        icon     = "circle-info",
+        duration = tonumber(args[1]),
+    })
+end, false)
+
+RegisterCommand("rl-helptextclear", function ()
+    lib.hideHelpText()
+end, false)
+
+RegisterCommand("rl-subtitle", function (_, args)
+    lib.showSubtitle({
+        text     = "Get to the ~y~marked location~s~ before the timer runs out.",
+        name     = "REC_Library",
+        duration = tonumber(args[1]),
+    })
+end, false)
+
+RegisterCommand("rl-subtitleclear", function ()
+    lib.hideSubtitle()
+end, false)
