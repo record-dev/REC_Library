@@ -41,6 +41,25 @@ config.debugMode = true
 config.language = "ja"
 
 ---[[
+---     NUI theme.
+---     "rec" is the RE:CORD look, "ox" reproduces the classic ox_lib look
+---]]
+---@type REC_Library.Shared.Enums.Theme
+config.theme = "rec"
+
+---[[
+---     Per theme options. "ox" reads the same convars ox_lib did, so a server.cfg
+---     that already sets ox:primaryColor keeps its colour
+---]]
+---@type REC_Library.Shared.Config.ThemeOptions
+config.themeOptions = {
+    ox = {
+        primaryColor = GetConvar("ox:primaryColor", "blue"),
+        primaryShade = GetConvarInt("ox:primaryShade", 8),
+    },
+}
+
+---[[
 ---      Detect Framework
 ---]]
 ---@type REC_Library.Shared.Enums.Framework
@@ -178,3 +197,6 @@ config.events = {
 }
 
 return config
+
+---@class REC_Library.Shared.Config.ThemeOptions
+---@field ox { primaryColor: string, primaryShade: integer }

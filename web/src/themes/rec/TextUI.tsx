@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useState } from 'react'
-import { iconClass, useNuiEvent } from '../nui'
-import type { TextUIData } from '../types'
+import { useTextUI } from '../../features/useTextUI'
+import { iconClass } from '../../nui'
+import type { TextUIData } from '../../types'
 
 // the wrapper centers, the animated child must not carry a translate class (framer-motion owns transform)
 const POSITION_CLASS: Record<NonNullable<TextUIData['position']>, string> = {
@@ -12,15 +12,7 @@ const POSITION_CLASS: Record<NonNullable<TextUIData['position']>, string> = {
 }
 
 export default function TextUI() {
-  const [data, setData] = useState<TextUIData | null>(null)
-
-  useNuiEvent<TextUIData>('textUI', (next) => {
-    if (next === null || typeof next !== 'object') return
-    setData(next)
-  })
-
-  useNuiEvent('hideTextUI', () => setData(null))
-
+  const data = useTextUI()
   const icon = iconClass(data?.icon)
   const style = data?.style !== undefined && Array.isArray(data.style) === false ? data.style : undefined
 

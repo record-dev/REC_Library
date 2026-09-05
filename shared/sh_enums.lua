@@ -9,6 +9,12 @@ enums.Languages = {
     custom = "custom",
 }
 
+---@enum REC_Library.Shared.Enums.Theme
+enums.Themes = {
+    rec = "rec",
+    ox = "ox",
+}
+
 ---@enum REC_Library.Shared.Enums.Framework
 enums.FrameworkTypes = {
     ox = "ox",

@@ -1,55 +1,12 @@
 import { Button, Progress, ScrollShadow } from '@nexus-ds/react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
-import { t } from '../i18n'
-import { fetchNui, iconClass, useNuiEvent } from '../nui'
-import type { ContextMenu as ContextMenuData, ContextOption } from '../types'
+import { showsArrow, useContextMenu } from '../../features/useContextMenu'
+import { t } from '../../i18n'
+import { iconClass } from '../../nui'
+import type { ContextOption } from '../../types'
 
 export default function ContextMenu() {
-  const [menu, setMenu] = useState<ContextMenuData | null>(null)
-  const [hovered, setHovered] = useState<number | null>(null)
-
-  useNuiEvent<ContextMenuData>('showContext', (next) => {
-    if (next === null || typeof next !== 'object') return
-    setHovered(null)
-    setMenu({ ...next, options: Array.isArray(next.options) ? next.options : [] })
-  })
-
-  useNuiEvent('hideContext', () => setMenu(null))
-
-  const canClose = menu !== null && menu.canClose !== false
-
-  const close = () => {
-    if (menu === null || canClose === false) return
-    setMenu(null)
-    void fetchNui('contextClose', { id: menu.id })
-  }
-
-  const back = () => {
-    if (menu === null) return
-    void fetchNui('contextBack', { id: menu.id })
-  }
-
-  const select = (index: number) => {
-    if (menu === null) return
-    const option = menu.options[index - 1]
-    if (option === undefined || option.disabled === true || option.readOnly === true) return
-    void fetchNui('contextSelect', { id: menu.id, index })
-  }
-
-  useEffect(() => {
-    if (menu === null) return
-
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') close()
-    }
-
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [menu, canClose])
-
-  const hoveredOption = menu !== null && hovered !== null ? menu.options[hovered - 1] : undefined
-  const metadata = hoveredOption?.metadata !== undefined && Array.isArray(hoveredOption.metadata) ? hoveredOption.metadata : []
+  const { menu, canClose, hoveredOption, metadata, setHovered, close, back, select } = useContextMenu()
 
   // the wrapper owns the centering: framer-motion writes transform on the animated
   // element, so a translate class there would be overwritten and the panel would slide down
@@ -130,7 +87,6 @@ interface OptionRowProps {
 function OptionRow({ option, onSelect, onHover }: OptionRowProps) {
   const icon = iconClass(option.icon)
   const clickable = option.disabled !== true && option.readOnly !== true
-  const showArrow = option.arrow === true || (option.hasMenu === true && option.arrow !== false)
 
   return (
     <button
@@ -159,7 +115,7 @@ function OptionRow({ option, onSelect, onHover }: OptionRowProps) {
           <Progress size="sm" aria-label={option.title ?? ''} value={option.progress} className="mt-1" />
         )}
       </div>
-      {showArrow && <i className="fa-solid fa-chevron-right text-tiny text-default-400" />}
+      {showsArrow(option) && <i className="fa-solid fa-chevron-right text-tiny text-default-400" />}
     </button>
   )
 }

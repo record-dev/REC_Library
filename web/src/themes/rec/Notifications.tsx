@@ -1,20 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useCallback, useRef, useState } from 'react'
-import { iconClass, useNuiEvent } from '../nui'
-import type { NotifyData, NotifyPosition, NotifyType } from '../types'
-
-interface Toast extends NotifyData {
-  key: string
-  duration: number
-  position: NotifyPosition
-}
-
-const TYPE_ICON: Record<NotifyType, string> = {
-  inform: 'circle-info',
-  success: 'circle-check',
-  warning: 'circle-exclamation',
-  error: 'circle-xmark',
-}
+import { NOTIFY_ICON, NOTIFY_POSITIONS, useNotifications, type Toast } from '../../features/useNotifications'
+import { iconClass } from '../../nui'
+import type { NotifyPosition, NotifyType } from '../../types'
 
 const TYPE_COLOR: Record<NotifyType, string> = {
   inform: '#38bdf8',
@@ -35,43 +22,12 @@ const POSITION_CLASS: Record<NotifyPosition, string> = {
   'center-left': 'top-1/2 left-6 -translate-y-1/2 items-start',
 }
 
-const POSITIONS = Object.keys(POSITION_CLASS) as NotifyPosition[]
-
-let counter = 0
-
 export default function Notifications() {
-  const [toasts, setToasts] = useState<Toast[]>([])
-  const timers = useRef<Map<string, number>>(new Map())
-
-  const remove = useCallback((key: string) => {
-    timers.current.delete(key)
-    setToasts((list) => list.filter((toast) => toast.key !== key))
-  }, [])
-
-  useNuiEvent<NotifyData>('notify', (data) => {
-    if (data === null || typeof data !== 'object') return
-
-    counter += 1
-    const key = data.id ?? `toast-${counter}`
-    const toast: Toast = {
-      ...data,
-      key,
-      type: data.type ?? 'inform',
-      duration: data.duration ?? 3000,
-      position: data.position ?? 'top-right',
-    }
-
-    const previous = timers.current.get(key)
-    if (previous !== undefined) window.clearTimeout(previous)
-    timers.current.set(key, window.setTimeout(() => remove(key), toast.duration))
-
-    // the same id replaces the toast that is still on screen
-    setToasts((list) => [...list.filter((item) => item.key !== key), toast])
-  })
+  const toasts = useNotifications()
 
   return (
     <>
-      {POSITIONS.map((position) => {
+      {NOTIFY_POSITIONS.map((position) => {
         const list = toasts.filter((toast) => toast.position === position)
         const fromBottom = position.startsWith('bottom')
         const slideX = position.endsWith('right') ? 24 : position.endsWith('left') ? -24 : 0
@@ -101,9 +57,8 @@ export default function Notifications() {
 }
 
 function ToastBody({ toast }: { toast: Toast }) {
-  const type = toast.type ?? 'inform'
-  const color = toast.iconColor ?? TYPE_COLOR[type]
-  const icon = iconClass(toast.icon, TYPE_ICON[type])
+  const color = toast.iconColor ?? TYPE_COLOR[toast.type]
+  const icon = iconClass(toast.icon, NOTIFY_ICON[toast.type])
 
   return (
     <div className="relative">

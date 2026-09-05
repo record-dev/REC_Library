@@ -68,10 +68,25 @@ local function loadStrings(name)
     return decoded
 end
 
+---[[
+---     Theme
+---     web/ picks the skin by name, the options are the per theme knobs from sh_config
+---]]
+---@return REC_Library.Client.UI.Nui.Theme
+function lib.getTheme()
+    return {
+        name = shCfg.theme,
+        options = shCfg.themeOptions[shCfg.theme],
+    }
+end
+
+exports("getTheme", lib.getTheme)
+
 RegisterNUICallback("ready", function (_, cb)
     cb(1)
 
     isReady = true
+    nui:send("setTheme", lib.getTheme())
     nui:send("setLocale", loadStrings(shCfg.language) or loadStrings("en"))
 end)
 
@@ -88,3 +103,7 @@ end
 exports("setClipboard", lib.setClipboard)
 
 return nui
+
+---@class REC_Library.Client.UI.Nui.Theme
+---@field name REC_Library.Shared.Enums.Theme
+---@field options table|nil
