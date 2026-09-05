@@ -27,19 +27,21 @@ function SoundConfigBuilder:new(name, ref)
     return instance
 end
 
----@param range number
+---@param range number|nil
 ---@return self
 function SoundConfigBuilder:setRange(range)
-    self.range = range * 1.0
-    return self
+    if range == nil then return self end
+    assert(type(range) == "number")
+    self.range = range * 1.0 return self
 end
 
 --- Settings can be changed using chain method
----@param isNetworked boolean
+---@param isNetworked boolean|nil
 ---@return self
 function SoundConfigBuilder:setIsNetworked(isNetworked)
-    self.isNetworked = isNetworked
-    return self
+    if isNetworked == nil then return self end
+    assert(type(isNetworked) == "boolean")
+    self.isNetworked = isNetworked return self
 end
 
 ---Build and return with table without table method
