@@ -213,6 +213,7 @@ local uiExports = {
     hideTextUI = true,
     isTextUIOpen = true,
     setClipboard = true,
+    getTheme = true,
 }
 
 ---@type table<string, boolean>

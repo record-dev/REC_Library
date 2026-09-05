@@ -1,0 +1,907 @@
+/* The classic ox_lib look: Mantine v6 dark scheme, Roboto, 4px radius, 1px 1px 3px shadows.
+   Every colour below is a Mantine default, the primary comes from --ox-primary (theme.ts). */
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('./fonts/Roboto-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Roboto';
+  src: url('./fonts/Roboto-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Roboto';
+  src: url('./fonts/Roboto-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Roboto Mono';
+  src: url('./fonts/RobotoMono-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --ox-primary: #1971c2;
+  --ox-primary-light: #a5d8ff;
+  --ox-primary-8-rgb: 25, 113, 194;
+  --ox-dark-0: #c1c2c5;
+  --ox-dark-1: #a6a7ab;
+  --ox-dark-2: #909296;
+  --ox-dark-3: #5c5f66;
+  --ox-dark-4: #373a40;
+  --ox-dark-5: #2c2e33;
+  --ox-dark-6: #25262b;
+  --ox-dark-7: #1a1b1e;
+  --ox-dark-8: #141517;
+  --ox-gray-3: #dee2e6;
+  --ox-red-5: #ff6b6b;
+  --ox-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  --ox-radius: 4px;
+}
+
+.ox-root {
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ox-dark-0);
+  -webkit-font-smoothing: antialiased;
+}
+
+.ox-root p {
+  margin: 0;
+}
+
+/* ox_lib hides every scrollbar */
+.ox-root *::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.ox-mono {
+  font-family: 'Roboto Mono', monospace;
+}
+
+/* ─── buttons ─── */
+
+.ox-btn {
+  height: 36px;
+  padding: 0 18px;
+  border: none;
+  border-radius: var(--ox-radius);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  user-select: none;
+  transition: background-color 0.1s;
+}
+.ox-btn:active {
+  transform: translateY(1px);
+}
+.ox-btn--default {
+  background: var(--ox-dark-6);
+  color: #fff;
+}
+.ox-btn--default:hover {
+  background: var(--ox-dark-5);
+}
+.ox-btn--light {
+  background: rgba(var(--ox-primary-8-rgb), 0.2);
+  color: var(--ox-primary-light);
+}
+.ox-btn--light:hover {
+  background: rgba(var(--ox-primary-8-rgb), 0.25);
+}
+.ox-btn:disabled,
+.ox-btn:disabled:hover {
+  background: var(--ox-dark-4);
+  color: var(--ox-dark-6);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ─── notifications ─── */
+
+.ox-toasts {
+  position: fixed;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 300px;
+  max-width: 90vw;
+  pointer-events: none;
+}
+
+.ox-notify {
+  width: 300px;
+  background: var(--ox-dark-6);
+  color: var(--ox-dark-0);
+  padding: 12px;
+  border-radius: var(--ox-radius);
+  box-shadow: var(--ox-shadow);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ox-notify--icon-top {
+  align-items: flex-start;
+}
+.ox-notify__icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+.ox-notify__ring {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  margin: -3px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ox-notify__ring svg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+.ox-notify__ring-track {
+  fill: none;
+  stroke: var(--ox-dark-4);
+  stroke-width: 2;
+}
+.ox-notify__ring-bar {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: butt;
+  stroke-dasharray: 113.1;
+  stroke-dashoffset: 0;
+  animation: ox-ring-drain linear forwards;
+}
+@keyframes ox-ring-drain {
+  to {
+    stroke-dashoffset: 113.1;
+  }
+}
+.ox-notify__body {
+  min-width: 0;
+  flex: 1;
+}
+.ox-notify__title {
+  font-weight: 500;
+  line-height: normal;
+  overflow-wrap: break-word;
+}
+.ox-notify__description {
+  font-size: 12px;
+  color: var(--ox-dark-2);
+  line-height: normal;
+  white-space: pre-line;
+  overflow-wrap: break-word;
+}
+.ox-notify__description--only {
+  font-size: 14px;
+}
+
+/* ─── textUI ─── */
+
+.ox-textui-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  pointer-events: none;
+}
+.ox-textui {
+  font-size: 16px;
+  padding: 12px;
+  margin: 8px;
+  background: var(--ox-dark-6);
+  color: var(--ox-dark-0);
+  border-radius: var(--ox-radius);
+  box-shadow: var(--ox-shadow);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 40vw;
+}
+.ox-textui--icon-top {
+  align-items: flex-start;
+}
+.ox-textui__icon {
+  font-size: 1.33em;
+  line-height: 1;
+}
+.ox-textui__text {
+  white-space: pre-line;
+  overflow-wrap: break-word;
+}
+
+/* ─── progress ─── */
+
+.ox-progress-wrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 20%;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.ox-progress {
+  position: relative;
+  width: 350px;
+  height: 45px;
+  border-radius: var(--ox-radius);
+  background: var(--ox-dark-5);
+  overflow: hidden;
+}
+.ox-progress__bar {
+  height: 100%;
+  background: var(--ox-primary);
+  animation: rec-progress-fill linear forwards;
+}
+.ox-progress__label-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ox-progress__label {
+  max-width: 350px;
+  padding: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 20px;
+  color: var(--ox-gray-3);
+  text-shadow: var(--ox-shadow);
+}
+
+.ox-circle-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+.ox-circle-wrap--bottom {
+  align-items: flex-end;
+  padding-bottom: 8vh;
+}
+.ox-circle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.ox-circle--middle {
+  margin-top: 25px;
+}
+.ox-circle__ring {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ox-circle__ring svg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+.ox-circle__track {
+  fill: none;
+  stroke: var(--ox-dark-5);
+  stroke-width: 7;
+}
+.ox-circle__bar {
+  fill: none;
+  stroke: var(--ox-primary);
+  stroke-width: 7;
+  stroke-dasharray: 260.75;
+  stroke-dashoffset: 260.75;
+  animation: ox-circle-fill linear forwards;
+}
+@keyframes ox-circle-fill {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.ox-circle__value {
+  text-align: center;
+  color: var(--ox-gray-3);
+  text-shadow: var(--ox-shadow);
+}
+.ox-circle__label {
+  height: 25px;
+  text-align: center;
+  color: var(--ox-gray-3);
+  text-shadow: var(--ox-shadow);
+}
+
+/* small Mantine Progress used in context rows and metadata */
+.ox-bar {
+  height: 5px;
+  width: 100%;
+  border-radius: 32px;
+  background: var(--ox-dark-4);
+  overflow: hidden;
+}
+.ox-bar__fill {
+  height: 100%;
+  background: var(--ox-primary);
+  border-radius: 32px;
+}
+
+/* ─── context menu ─── */
+
+.ox-context {
+  position: fixed;
+  top: 15%;
+  right: 25%;
+  width: 320px;
+  height: 580px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+}
+.ox-context__header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 6px;
+}
+.ox-context__hbtn {
+  flex: 1 15%;
+  align-self: stretch;
+  height: auto;
+  padding: 2px;
+  border: none;
+  border-radius: var(--ox-radius);
+  background: var(--ox-dark-6);
+  color: var(--ox-dark-0);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.ox-context__hbtn:hover {
+  background: var(--ox-dark-5);
+}
+.ox-context__hbtn:disabled {
+  color: var(--ox-dark-2);
+  cursor: default;
+}
+.ox-context__hbtn:disabled:hover {
+  background: var(--ox-dark-6);
+}
+.ox-context__title {
+  flex: 1 85%;
+  border-radius: var(--ox-radius);
+  background: var(--ox-dark-6);
+  min-width: 0;
+}
+.ox-context__title p {
+  color: var(--ox-dark-0);
+  padding: 6px;
+  text-align: center;
+  overflow-wrap: break-word;
+}
+.ox-context__list {
+  height: 560px;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.ox-context__btn {
+  width: 100%;
+  height: fit-content;
+  padding: 10px;
+  border: none;
+  border-radius: var(--ox-radius);
+  background: var(--ox-dark-6);
+  color: var(--ox-dark-0);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+.ox-context__btn:hover {
+  background: var(--ox-dark-5);
+}
+.ox-context__btn:active {
+  transform: translateY(1px);
+}
+.ox-context__btn--readonly,
+.ox-context__btn--readonly:hover {
+  background: var(--ox-dark-6);
+  cursor: default;
+}
+.ox-context__btn--readonly:active {
+  transform: none;
+}
+.ox-context__btn:disabled,
+.ox-context__btn:disabled:hover {
+  background: var(--ox-dark-4);
+  color: var(--ox-dark-3);
+  cursor: not-allowed;
+  transform: none;
+}
+.ox-context__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+.ox-context__group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+.ox-context__icon {
+  width: 25px;
+  height: 25px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.33em;
+}
+.ox-context__icon img {
+  max-width: 25px;
+  max-height: 25px;
+}
+.ox-context__text {
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  min-width: 0;
+}
+.ox-context__desc {
+  color: var(--ox-dark-2);
+  font-size: 12px;
+  font-weight: 400;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+.ox-context__btn:disabled .ox-context__desc {
+  color: var(--ox-dark-3);
+}
+.ox-context__arrow {
+  width: 25px;
+  height: 25px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--ox-dark-2);
+}
+.ox-context__dropdown {
+  position: fixed;
+  z-index: 35;
+  padding: 10px;
+  color: var(--ox-dark-0);
+  font-size: 14px;
+  max-width: 256px;
+  width: fit-content;
+  background: var(--ox-dark-6);
+  border-radius: var(--ox-radius);
+  box-shadow: var(--ox-shadow);
+  pointer-events: none;
+}
+.ox-context__dropdown img {
+  display: block;
+  max-width: 100%;
+  margin-bottom: 4px;
+}
+.ox-context__meta {
+  display: flex;
+  flex-direction: column;
+}
+.ox-context__meta .ox-bar {
+  margin: 2px 0 4px;
+}
+
+/* ─── modals ─── */
+
+.ox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 5vh 16px;
+  overflow-y: auto;
+}
+.ox-overlay--centered {
+  align-items: center;
+}
+.ox-modal {
+  width: 440px;
+  max-width: 100%;
+  max-height: 90vh;
+  background: var(--ox-dark-7);
+  border-radius: var(--ox-radius);
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05) 0 10px 15px -5px, rgba(0, 0, 0, 0.04) 0 7px 7px -5px;
+  display: flex;
+  flex-direction: column;
+}
+.ox-modal--xs { width: 320px; }
+.ox-modal--sm { width: 380px; }
+.ox-modal--md { width: 440px; }
+.ox-modal--lg { width: 620px; }
+.ox-modal--xl { width: 780px; }
+.ox-modal__header {
+  margin-bottom: 16px;
+}
+.ox-modal__title {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--ox-dark-0);
+  overflow-wrap: break-word;
+}
+.ox-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+  overflow-y: auto;
+}
+.ox-modal__content {
+  color: var(--ox-dark-2);
+  white-space: pre-line;
+  overflow-wrap: break-word;
+}
+.ox-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* ─── inputs ─── */
+
+.ox-field {
+  display: flex;
+  flex-direction: column;
+}
+.ox-field__label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ox-dark-0);
+  margin-bottom: 5px;
+  overflow-wrap: break-word;
+}
+.ox-field__required {
+  color: var(--ox-red-5);
+  margin-left: 2px;
+}
+.ox-field__description {
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--ox-dark-2);
+  margin-top: -3px;
+  margin-bottom: 5px;
+  overflow-wrap: break-word;
+}
+.ox-field__control {
+  position: relative;
+}
+.ox-field__icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ox-dark-2);
+  pointer-events: none;
+}
+.ox-input {
+  width: 100%;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 12px;
+  background: var(--ox-dark-6);
+  border: 1px solid var(--ox-dark-4);
+  border-radius: var(--ox-radius);
+  color: var(--ox-dark-0);
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.1s;
+  color-scheme: dark;
+}
+.ox-input::placeholder {
+  color: var(--ox-dark-3);
+}
+.ox-input:focus,
+.ox-input--open {
+  border-color: var(--ox-primary);
+}
+.ox-input:disabled {
+  background: var(--ox-dark-6);
+  color: var(--ox-dark-3);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.ox-input--icon {
+  padding-left: 36px;
+}
+.ox-input--select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+  text-align: left;
+  user-select: none;
+}
+.ox-input--select:disabled {
+  cursor: not-allowed;
+}
+.ox-input__placeholder {
+  color: var(--ox-dark-3);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ox-input__value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ox-input__chevron {
+  color: var(--ox-dark-2);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.ox-input--multi {
+  height: auto;
+  min-height: 36px;
+  padding: 3px 12px 3px 3px;
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+.ox-input--multi.ox-input--icon {
+  padding-left: 36px;
+}
+.ox-input__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+.ox-chip {
+  height: 22px;
+  padding: 0 4px 0 10px;
+  border-radius: 32px;
+  background: var(--ox-dark-7);
+  color: var(--ox-dark-0);
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+}
+.ox-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ox-chip button {
+  border: none;
+  background: transparent;
+  color: var(--ox-dark-2);
+  cursor: pointer;
+  font-size: 10px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.ox-chip button:hover {
+  color: var(--ox-dark-0);
+}
+textarea.ox-input {
+  height: auto;
+  padding: 7px 12px;
+  line-height: 1.55;
+  resize: none;
+}
+.ox-dropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 60;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 4px;
+  background: var(--ox-dark-7);
+  border: 1px solid var(--ox-dark-4);
+  border-radius: var(--ox-radius);
+  box-shadow: var(--ox-shadow);
+  display: flex;
+  flex-direction: column;
+}
+.ox-dropdown__item {
+  border: none;
+  background: transparent;
+  color: var(--ox-dark-0);
+  font: inherit;
+  text-align: left;
+  padding: 7px 12px;
+  border-radius: var(--ox-radius);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ox-dropdown__item:hover {
+  background: var(--ox-dark-4);
+}
+.ox-dropdown__item--selected,
+.ox-dropdown__item--selected:hover {
+  background: var(--ox-primary);
+  color: #fff;
+}
+.ox-dropdown__empty {
+  padding: 7px 12px;
+  color: var(--ox-dark-2);
+}
+
+/* checkbox */
+.ox-checkbox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.ox-checkbox--disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.ox-checkbox input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.ox-checkbox__box {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border: 1px solid var(--ox-dark-4);
+  border-radius: var(--ox-radius);
+  background: var(--ox-dark-6);
+  color: transparent;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.1s, border-color 0.1s;
+}
+.ox-checkbox input:checked + .ox-checkbox__box {
+  background: var(--ox-primary);
+  border-color: var(--ox-primary);
+  color: #fff;
+}
+.ox-checkbox__label {
+  font-size: 14px;
+  color: var(--ox-dark-0);
+  line-height: 1.55;
+}
+.ox-checkbox__description {
+  font-size: 12px;
+  color: var(--ox-dark-2);
+  line-height: 1.2;
+}
+
+/* slider, the fill is a gradient stop driven by --ox-slider-fill */
+.ox-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  margin: 8px 0;
+  border-radius: 32px;
+  background: linear-gradient(to right, var(--ox-primary) var(--ox-slider-fill, 0%), var(--ox-dark-4) var(--ox-slider-fill, 0%));
+  outline: none;
+  cursor: pointer;
+}
+.ox-slider:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.ox-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--ox-primary);
+  border: 4px solid #fff;
+  box-sizing: border-box;
+  cursor: grab;
+}
+.ox-slider-value {
+  font-size: 12px;
+  color: var(--ox-dark-2);
+  margin-left: auto;
+}
+.ox-field__label--row {
+  display: flex;
+  align-items: center;
+}
+
+/* colour, a swatch in the left section and the hex in the input */
+.ox-color__swatch {
+  position: absolute;
+  left: 9px;
+  top: 9px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+  cursor: pointer;
+}
+.ox-color__swatch input {
+  position: absolute;
+  inset: -8px;
+  width: 40px;
+  height: 40px;
+  opacity: 0;
+  cursor: pointer;
+}

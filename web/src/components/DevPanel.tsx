@@ -73,6 +73,9 @@ const SAMPLES: { label: string; run: () => void }[] = [
   { label: 'textUI', run: () => send('textUI', { text: '[E] - 調べる', position: 'left-center', icon: 'fa-solid fa-question', iconColor: 'white' }) },
   { label: 'hide textUI', run: () => send('hideTextUI') },
   { label: 'locale ja', run: () => send('setLocale', { CONFIRM: '決定', CANCEL: 'キャンセル', SUBMIT: '送信' }) },
+  { label: 'theme rec', run: () => send('setTheme', { name: 'rec' }) },
+  { label: 'theme ox', run: () => send('setTheme', { name: 'ox', options: { primaryColor: 'blue', primaryShade: 8 } }) },
+  { label: 'theme ox teal', run: () => send('setTheme', { name: 'ox', options: { primaryColor: 'teal', primaryShade: 6 } }) },
 ]
 
 export default function DevPanel() {
