@@ -1,29 +1,5 @@
 // The shapes cl_*.lua sends. Every field the Lua side leaves nil is simply absent here.
 
-export type NotifyType = 'inform' | 'success' | 'warning' | 'error'
-
-export type NotifyPosition =
-  | 'top'
-  | 'top-right'
-  | 'top-left'
-  | 'bottom'
-  | 'bottom-right'
-  | 'bottom-left'
-  | 'center-right'
-  | 'center-left'
-
-export interface NotifyData {
-  id?: string
-  title?: string
-  description?: string
-  duration?: number
-  showDuration?: boolean
-  position?: NotifyPosition
-  type?: NotifyType
-  icon?: string
-  iconColor?: string
-}
-
 export interface AlertData {
   header: string
   content: string

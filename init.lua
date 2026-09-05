@@ -172,7 +172,9 @@ local moduleIndex = {
     getVehicleProperties = "vehicleProperties",
     setVehicleProperties = "vehicleProperties",
 
-    notify = "notify", -- server only, the client resolves it through uiExports
+    notify = "notify", -- forwards to REC_Notify
+    defaultNotify = "notify",
+    showNotification = "notify",
 
     points = "points",
 
@@ -195,9 +197,6 @@ local moduleIndex = {
 
 ---@type table<string, boolean>
 local uiExports = {
-    notify = true,
-    defaultNotify = true,
-    showNotification = true,
     alertDialog = true,
     closeAlertDialog = true,
     inputDialog = true,

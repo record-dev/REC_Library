@@ -25,7 +25,6 @@ shared_script {
 
 client_scripts {
     'client/class/**/*.lua',
-    'client/ui/cl_notify.lua',
     'client/ui/cl_alert.lua',
     'client/ui/cl_input.lua',
     'client/ui/cl_context.lua',

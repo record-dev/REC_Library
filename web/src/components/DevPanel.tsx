@@ -8,21 +8,6 @@ function send(action: string, data?: unknown) {
 
 const SAMPLES: { label: string; run: () => void }[] = [
   {
-    label: 'notify',
-    run: () =>
-      send('notify', {
-        title: 'REC_Library',
-        description: 'ox_lib is gone.\nEverything comes from here now.',
-        type: 'success',
-        showDuration: true,
-        duration: 4000,
-      }),
-  },
-  {
-    label: 'notify error (bottom)',
-    run: () => send('notify', { description: 'Something broke', type: 'error', position: 'bottom' }),
-  },
-  {
     label: 'alert',
     run: () =>
       send('alert', {
