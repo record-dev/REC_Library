@@ -54,12 +54,14 @@ function Zone:create()
         info.zone = lib.zones.sphere(info.options)
     else
         utils:debugPrint("Invalid zone type: " .. tostring(info.zoneType))
+        info.isResolving = false
         return false
     end
 
     -- Final check
     if info.zone == nil or type(info.zone) ~= "table" then
         utils:debugPrint("Failed to create zone.")
+        info.isResolving = false
         return false
     end
 
