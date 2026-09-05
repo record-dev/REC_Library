@@ -5,6 +5,8 @@
 ---     the local player and calls inside every frame while the player is in it.
 ---     One 300ms thread checks every zone of this resource, a per frame thread only
 ---     runs while a zone needs inside or debug drawing.
+---     The check thread skips a tick while the player barely moved and rejects a zone
+---     with a bounding radius before running the real containment test.
 ---]]
 
 ---@class REC_Library.Lib.Zone.Options
@@ -23,6 +25,7 @@
 ---@class REC_Library.Lib.Zone: REC_Library.Lib.Zone.Options
 ---@field id integer
 ---@field type "sphere" | "box" | "poly"
+---@field bounds? number outer radius used to reject the zone before contains()
 ---@field insideZone boolean
 ---@field remove fun(self: REC_Library.Lib.Zone)
 ---@field contains fun(self: REC_Library.Lib.Zone, coords: vector3): boolean
@@ -42,6 +45,18 @@ local checkRunning = false
 
 ---@type boolean
 local tickRunning = false
+
+---@type integer number of zones that need the per frame thread
+local tickCount = 0
+
+---@type boolean the registry changed since the last check
+local isDirty = true
+
+---@type vector3|nil player coords used by the last check
+local lastCoords = nil
+
+---@type number the player has to move this far before the zones are checked again
+local checkThreshold = 0.35
 
 ---@type { r: integer, g: integer, b: integer, a: integer }
 local defaultColour = { r = 0, g = 255, b = 136, a = 60, }
@@ -163,9 +178,20 @@ end
 local function remove(self)
 
     registry[self.id] = nil
+    isDirty = true
+
+    if self.debug == true then
+        tickCount -= 1
+    end
 
     if self.insideZone == true then
+
         self.insideZone = false
+
+        if self.inside ~= nil then
+            tickCount -= 1
+        end
+
         if self.onExit ~= nil then
             self:onExit()
         end
@@ -177,7 +203,14 @@ end
 ---@param colour? { r: integer, g: integer, b: integer, a?: integer }
 local function setDebug(self, toggle, colour)
 
-    self.debug = toggle == true
+    local previous = self.debug == true
+    local enabled = toggle == true
+
+    if enabled ~= previous then
+        tickCount += enabled == true and 1 or -1
+    end
+
+    self.debug = enabled
 
     if colour ~= nil then
         self.debugColour = colour
@@ -281,14 +314,7 @@ end
 ---]]
 ---@return boolean
 local function needsTick()
-
-    for _, zone in pairs(registry) do
-        if zone.debug == true or (zone.inside ~= nil and zone.insideZone == true) then
-            return true
-        end
-    end
-
-    return false
+    return tickCount > 0
 end
 
 function zones._ensureTick()
@@ -333,20 +359,37 @@ local function ensureCheck()
 
             local coords = GetEntityCoords(cache.ped)
 
-            for _, zone in pairs(registry) do
+            -- skip the whole sweep while the player is standing still
+            if isDirty == true or lastCoords == nil or #(coords - lastCoords) >= checkThreshold then
 
-                local inside = zone:contains(coords)
-                if inside ~= zone.insideZone then
+                isDirty = false
+                lastCoords = coords
 
-                    zone.insideZone = inside
+                for _, zone in pairs(registry) do
 
-                    if inside == true then
-                        if zone.onEnter ~= nil then
-                            zone:onEnter()
+                    local inside = false
+
+                    -- broad phase, the bounding radius rejects the zone before the real test
+                    if zone.bounds == nil or #(coords - zone.coords) <= zone.bounds then
+                        inside = zone:contains(coords)
+                    end
+
+                    if inside ~= zone.insideZone then
+
+                        zone.insideZone = inside
+
+                        if zone.inside ~= nil then
+                            tickCount += inside == true and 1 or -1
                         end
-                        zones._ensureTick()
-                    elseif zone.onExit ~= nil then
-                        zone:onExit()
+
+                        if inside == true then
+                            if zone.onEnter ~= nil then
+                                zone:onEnter()
+                            end
+                            zones._ensureTick()
+                        elseif zone.onExit ~= nil then
+                            zone:onExit()
+                        end
                     end
                 end
             end
@@ -370,13 +413,19 @@ local function register(zoneType, options, contains, draw)
     local zone = options --[[@as REC_Library.Lib.Zone]]
     zone.id = nextId
     zone.type = zoneType
+    zone.debug = zone.debug == true
     zone.insideZone = false
     zone.contains = contains
     zone.draw = draw
     zone.remove = remove
     zone.setDebug = setDebug
 
+    if zone.debug == true then
+        tickCount += 1
+    end
+
     registry[nextId] = zone
+    isDirty = true
 
     ensureCheck()
     zones._ensureTick()
@@ -398,6 +447,9 @@ function zones.sphere(options)
 
     options.radius = options.radius or 2.0
 
+    -- a sphere test is already the cheapest one, no broad phase needed
+    options.bounds = nil
+
     return register("sphere", options, sphereContains, drawSphere)
 end
 
@@ -410,6 +462,7 @@ function zones.box(options)
 
     options.size = options.size or vector3(2.0, 2.0, 2.0)
     options.matrix = rotationMatrix(options.rotation)
+    options.bounds = #(options.size / 2)
 
     return register("box", options, boxContains, drawBox)
 end
@@ -436,6 +489,16 @@ function zones.poly(options)
     options.minZ = minZ - thickness / 2
     options.maxZ = maxZ + thickness / 2
     options.coords = vector3(sumX / #options.points, sumY / #options.points, (minZ + maxZ) / 2)
+
+    local radius = 0.0
+    for _, point in ipairs(options.points) do
+        local distance = #(vector2(point.x, point.y) - vector2(options.coords.x, options.coords.y))
+        if distance > radius then
+            radius = distance
+        end
+    end
+
+    options.bounds = radius + (options.maxZ - options.minZ) / 2
 
     return register("poly", options, polyContains, drawPoly)
 end
