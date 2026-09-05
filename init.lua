@@ -199,6 +199,7 @@ local uiExports = {
     defaultNotify = true,
     showNotification = true,
     alertDialog = true,
+    closeAlertDialog = true,
     inputDialog = true,
     closeInputDialog = true,
     registerContext = true,
