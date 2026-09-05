@@ -175,6 +175,10 @@ local moduleIndex = {
     notify = "notify", -- forwards to REC_Notify
     defaultNotify = "notify",
     showNotification = "notify",
+    showHelpText = "helpText",
+    hideHelpText = "helpText",
+    showSubtitle = "subtitle",
+    hideSubtitle = "subtitle",
 
     points = "points",
 
