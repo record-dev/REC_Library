@@ -374,6 +374,44 @@ function ServerManager:unregisterEntity(uid)
     return true
 end
 
+---Drop an entity registration whose entity is already gone.
+---Ownership and uid are released, nothing is destroyed.
+---@param uid string Unique distinguished name
+---@return boolean
+function ServerManager:forgetEntity(uid)
+    local info = self.info
+
+    -- Manager existence check
+    if info.entityManager == nil then
+        utils:debugPrint("[ServerManager] EntityManager is not set.")
+        return false
+    end
+
+    assert(uid ~= nil and type(uid) == "string", "uid must be a string")
+
+    local entityData = info.entityManager:getDataByUniqueId(uid)
+
+    -- Skip if empty
+    if entityData == nil then
+        utils:debugPrint("ServerManager:forgetEntity: Entity not found with uid: " .. uid)
+        return false
+    end
+
+    -- Release management by owner
+    local entityNetId = entityData.netId
+    if entityData.syncType == "server"
+        and entityNetId ~= nil
+        and info.ownershipManager ~= nil
+        and info.ownershipManager:getDataByNetId(entityNetId) ~= nil
+    then
+        if info.ownershipManager:unregister(entityNetId) == false then
+            utils:debugPrint("ServerManager:forgetEntity: Failed to unregister netId: " .. tostring(entityNetId))
+        end
+    end
+
+    return info.entityManager:forget(uid)
+end
+
 ---@param needDestroy? boolean
 ---@return boolean
 function ServerManager:unregisterAllEntity(needDestroy)
