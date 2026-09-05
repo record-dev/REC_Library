@@ -38,6 +38,7 @@ export default function App() {
   return (
     <div key={`${theme.name}-${localeVersion}`} className={`dark text-foreground ${theme.name === 'ox' ? 'ox-root' : ''}`}>
       <Skin.TextUI />
+      <Skin.HelpText />
       <Skin.ProgressBar />
       <Skin.ContextMenu />
       <Skin.AlertDialog />

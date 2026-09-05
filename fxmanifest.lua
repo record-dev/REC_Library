@@ -31,6 +31,7 @@ client_scripts {
     'client/ui/cl_progress.lua',
     'client/ui/cl_textUI.lua',
     'client/ui/cl_text.lua',
+    'client/ui/cl_helpText.lua',
     'client/*.lua'
 }
 

@@ -212,6 +212,9 @@ local uiExports = {
     showTextUI = true,
     hideTextUI = true,
     isTextUIOpen = true,
+    showHelpText = true,
+    hideHelpText = true,
+    isHelpTextOpen = true,
     setClipboard = true,
     getTheme = true,
 }

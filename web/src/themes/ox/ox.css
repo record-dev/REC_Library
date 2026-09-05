@@ -150,6 +150,28 @@
   overflow-wrap: break-word;
 }
 
+/* ─── help text / subtitle ─── */
+
+.ox-helptext-wrap {
+  position: fixed;
+  z-index: 10;
+  pointer-events: none;
+}
+.ox-key {
+  display: inline-block;
+  min-width: 1.6em;
+  margin: 0 2px;
+  padding: 0 6px;
+  border: 1px solid currentColor;
+  border-radius: var(--ox-radius);
+  background: var(--ox-dark-5);
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.85em;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  vertical-align: baseline;
+}
 /* ─── progress ─── */
 
 .ox-progress-wrap {
