@@ -20,6 +20,9 @@ local focusOwners = {}
 ---@type boolean
 local isReady = false
 
+---@type fun()[]
+local readyHandlers = {}
+
 ---@param action string
 ---@param data? any
 function nui:send(action, data)
@@ -48,6 +51,14 @@ end
 ---@return boolean
 function nui:isReady()
     return isReady
+end
+
+---[[
+---     Runs every time the page reports ready, so an overlay can send its state again after a NUI reboot
+---]]
+---@param handler fun()
+function nui:onReady(handler)
+    readyHandlers[#readyHandlers+1] = handler
 end
 
 ---@param name string
@@ -82,12 +93,44 @@ end
 
 exports("getTheme", lib.getTheme)
 
+---[[
+---     Layout of the HUD text, the per widget knobs from sh_config
+---]]
+---@return table
+local function uiConfig()
+
+    local helpTextCfg, subtitleCfg = shCfg.ui.helpText, shCfg.ui.subtitle
+
+    return {
+        helpText = {
+            position          = helpTextCfg.position,
+            offsetX           = helpTextCfg.offset.x,
+            offsetY           = helpTextCfg.offset.y,
+            maxWidth          = helpTextCfg.maxWidth,
+            fontScale         = helpTextCfg.fontScale,
+            animationDuration = helpTextCfg.animationDuration,
+        },
+        subtitle = {
+            offsetY           = subtitleCfg.offset.y,
+            maxWidth          = subtitleCfg.maxWidth,
+            background        = subtitleCfg.background,
+            fontScale         = subtitleCfg.fontScale,
+            animationDuration = subtitleCfg.animationDuration,
+        },
+    }
+end
+
 RegisterNUICallback("ready", function (_, cb)
     cb(1)
 
     isReady = true
     nui:send("setTheme", lib.getTheme())
     nui:send("setLocale", loadStrings(shCfg.language) or loadStrings("en"))
+    nui:send("setUiConfig", uiConfig())
+
+    for _, handler in ipairs(readyHandlers) do
+        handler()
+    end
 end)
 
 

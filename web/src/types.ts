@@ -94,3 +94,69 @@ export interface TextUIData {
   alignIcon?: 'top' | 'center'
   style?: Record<string, string>
 }
+
+// ─── help text / subtitle ────────────────────────────
+
+export type HelpTextPosition =
+  | 'top-left'
+  | 'top-center'
+  | 'top-right'
+  | 'left-center'
+  | 'right-center'
+  | 'bottom-left'
+  | 'bottom-center'
+  | 'bottom-right'
+
+export const HELP_TEXT_POSITIONS: readonly HelpTextPosition[] = [
+  'top-left',
+  'top-center',
+  'top-right',
+  'left-center',
+  'right-center',
+  'bottom-left',
+  'bottom-center',
+  'bottom-right',
+]
+
+/** shaped by cl_helpText.lua, duration 0 stays until hidden */
+export interface HelpTextData {
+  id: string
+  text: string
+  icon?: string
+  color: string
+  position: HelpTextPosition
+  duration: number
+}
+
+/** shaped by cl_subtitle.lua, duration 0 stays until hidden */
+export interface SubtitleData {
+  id: string
+  text: string
+  name?: string
+  color: string
+  duration: number
+}
+
+/** built by cl_nui.lua from config.ui.helpText */
+export interface HelpTextConfig {
+  position: HelpTextPosition
+  offsetX: string
+  offsetY: string
+  maxWidth: string
+  fontScale: number
+  animationDuration: number
+}
+
+/** built by cl_nui.lua from config.ui.subtitle */
+export interface SubtitleConfig {
+  offsetY: string
+  maxWidth: string
+  background: boolean
+  fontScale: number
+  animationDuration: number
+}
+
+export interface HudConfig {
+  helpText: HelpTextConfig
+  subtitle: SubtitleConfig
+}

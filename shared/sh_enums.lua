@@ -96,6 +96,21 @@ enums.DispatchTypes = {
     custom = "custom",
 }
 
+---[[
+---     where lib.showHelpText sits (the GTA help text lives at the top left)
+---]]
+---@enum REC_Library.Shared.Enums.HelpTextPosition
+enums.HelpTextPosition = {
+    top_left = "top-left",
+    top_center = "top-center",
+    top_right = "top-right",
+    left_center = "left-center",
+    right_center = "right-center",
+    bottom_left = "bottom-left",
+    bottom_center = "bottom-center",
+    bottom_right = "bottom-right",
+}
+
 ---@enum REC_Library.Shared.Enums.Notify
 enums.NotifyTypes = {
     rec = "rec",

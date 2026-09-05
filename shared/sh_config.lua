@@ -60,6 +60,136 @@ config.themeOptions = {
 }
 
 ---[[
+---     Layout of the HUD text the NUI draws (lib.showHelpText / lib.showSubtitle)
+---]]
+config.ui = {
+
+    ---[[
+    ---     Help text (control hint), the NUI version of the GTA help text
+    ---]]
+    helpText = {
+
+        ---[[
+        ---     Default position (each help text can override it with data.position)
+        ---]]
+        ---@type REC_Library.Shared.Enums.HelpTextPosition
+        position = "top-left",
+        offset = {
+            ---@type string
+            x = "1.6vw",
+            ---@type string
+            y = "3vh",
+        },
+
+        ---[[
+        ---     Widest the card can get (CSS units)
+        ---]]
+        ---@type string
+        maxWidth = "380px",
+
+        ---[[
+        ---     Colour of the icon and the keycaps when the caller omits color
+        ---]]
+        ---@type string
+        color = "#e2e8f0",
+
+        ---[[
+        ---     Font size multiplier (1.0 is the default)
+        ---]]
+        ---@type number
+        fontScale = 1.0,
+
+        ---[[
+        ---     Enter and exit animation time
+        ---]]
+        ---@type integer
+        animationDuration = 200, -- ms
+
+        ---[[
+        ---     Key drawn for a GTA control token in the text ("~INPUT_CONTEXT~" becomes the [E] keycap)
+        ---     a token missing here is drawn with its control name
+        ---]]
+        ---@type table<string, string>
+        inputKeys = {
+            INPUT_CONTEXT          = "E",
+            INPUT_PICKUP           = "E",
+            INPUT_TALK             = "E",
+            INPUT_VEH_HORN         = "E",
+            INPUT_ENTER            = "F",
+            INPUT_VEH_EXIT         = "F",
+            INPUT_DETONATE         = "G",
+            INPUT_COVER            = "Q",
+            INPUT_RELOAD           = "R",
+            INPUT_MULTIPLAYER_INFO = "Z",
+            INPUT_INTERACTION_MENU = "M",
+            INPUT_SPRINT           = "SHIFT",
+            INPUT_JUMP             = "SPACE",
+            INPUT_DUCK             = "CTRL",
+            INPUT_ATTACK           = "LMB",
+            INPUT_AIM              = "RMB",
+            INPUT_FRONTEND_ACCEPT  = "ENTER",
+            INPUT_FRONTEND_CANCEL  = "ESC",
+            INPUT_FRONTEND_RRIGHT  = "BACKSPACE",
+            INPUT_FRONTEND_X       = "SPACE",
+            INPUT_FRONTEND_UP      = "\u{2191}",
+            INPUT_FRONTEND_DOWN    = "\u{2193}",
+            INPUT_FRONTEND_LEFT    = "\u{2190}",
+            INPUT_FRONTEND_RIGHT   = "\u{2192}",
+            INPUT_CELLPHONE_UP     = "\u{2191}",
+            INPUT_CELLPHONE_DOWN   = "\u{2193}",
+            INPUT_CELLPHONE_LEFT   = "\u{2190}",
+            INPUT_CELLPHONE_RIGHT  = "\u{2192}",
+        },
+    },
+
+    ---[[
+    ---     Subtitle (objective text at the bottom of the screen), the NUI version of the GTA subtitle
+    ---]]
+    subtitle = {
+
+        ---[[
+        ---     Distance from the bottom of the screen and the widest the text can get (CSS units)
+        ---]]
+        offset = {
+            ---@type string
+            y = "9vh",
+        },
+        ---@type string
+        maxWidth = "60vw",
+
+        ---[[
+        ---     Draw a translucent box behind the text
+        ---]]
+        ---@type boolean
+        background = true,
+
+        ---[[
+        ---     Colour of the speaker name when the caller omits color
+        ---]]
+        ---@type string
+        color = "#fbbf24",
+
+        ---[[
+        ---     Font size multiplier (1.0 is the default)
+        ---]]
+        ---@type number
+        fontScale = 1.0,
+
+        ---[[
+        ---     Display time used when duration is omitted (0 in the data keeps it until lib.hideSubtitle)
+        ---]]
+        ---@type integer
+        defaultDuration = 5000, -- ms
+
+        ---[[
+        ---     Enter and exit animation time
+        ---]]
+        ---@type integer
+        animationDuration = 200, -- ms
+    },
+}
+
+---[[
 ---      Detect Framework
 ---]]
 ---@type REC_Library.Shared.Enums.Framework
