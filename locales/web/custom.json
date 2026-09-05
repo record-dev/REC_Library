@@ -1,0 +1,11 @@
+{
+    "LOCALE": "en-US",
+    "CONFIRM": "Confirm",
+    "CANCEL": "Cancel",
+    "SUBMIT": "Submit",
+    "CLOSE": "Close",
+    "BACK": "Back",
+    "SELECT_PLACEHOLDER": "Select...",
+    "REQUIRED": "Required",
+    "PROGRESS_CANCEL_HINT": "Press X to cancel"
+}
