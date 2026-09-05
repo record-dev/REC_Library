@@ -57,6 +57,31 @@ const SAMPLES: { label: string; run: () => void }[] = [
   { label: 'progress circle', run: () => send('progress', { duration: 3000, label: 'Searching', circle: true, position: 'middle' }) },
   { label: 'textUI', run: () => send('textUI', { text: '[E] - 調べる', position: 'left-center', icon: 'fa-solid fa-question', iconColor: 'white' }) },
   { label: 'hide textUI', run: () => send('hideTextUI') },
+  {
+    label: 'help text',
+    run: () =>
+      send('helpText', {
+        id: 'sample-help',
+        text: '[E] 調べる\n[ESC] ~r~キャンセル~s~',
+        icon: 'circle-info',
+        color: '#e2e8f0',
+        position: 'top-left',
+        duration: 0,
+      }),
+  },
+  { label: 'hide help text', run: () => send('hideHelpText', {}) },
+  {
+    label: 'subtitle',
+    run: () =>
+      send('subtitle', {
+        id: 'sample-subtitle',
+        text: '時間切れになる前に~y~指定の場所~s~へ向かえ。',
+        name: 'REC_Library',
+        color: '#fbbf24',
+        duration: 5000,
+      }),
+  },
+  { label: 'hide subtitle', run: () => send('hideSubtitle', {}) },
   { label: 'locale ja', run: () => send('setLocale', { CONFIRM: '決定', CANCEL: 'キャンセル', SUBMIT: '送信' }) },
   { label: 'theme rec', run: () => send('setTheme', { name: 'rec' }) },
   { label: 'theme ox', run: () => send('setTheme', { name: 'ox', options: { primaryColor: 'blue', primaryShade: 8 } }) },
