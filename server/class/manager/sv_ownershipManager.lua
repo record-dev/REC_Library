@@ -396,7 +396,9 @@ function OwnershipManager:checkOwnership(oldOwner, netIds)
             info.netIdsData[netId].owner = newOwner
 
             -- Callback when checked
-            info.onCheckOwnership(self, entityHandle, netId, oldOwner, newOwner)
+            if info.onCheckOwnership ~= nil then
+                info.onCheckOwnership(self, entityHandle, netId, oldOwner, newOwner)
+            end
 
             -- Execute ownership check callback
             if info.netIdsData[netId].callbacks.onCheckOwnership ~= nil then
