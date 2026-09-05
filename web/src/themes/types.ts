@@ -4,6 +4,7 @@ import type { ComponentType } from 'react'
 export interface ThemeComponents {
   TextUI: ComponentType
   HelpText: ComponentType
+  Subtitle: ComponentType
   ProgressBar: ComponentType
   ContextMenu: ComponentType
   AlertDialog: ComponentType

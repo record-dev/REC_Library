@@ -215,6 +215,9 @@ local uiExports = {
     showHelpText = true,
     hideHelpText = true,
     isHelpTextOpen = true,
+    showSubtitle = true,
+    hideSubtitle = true,
+    isSubtitleOpen = true,
     setClipboard = true,
     getTheme = true,
 }

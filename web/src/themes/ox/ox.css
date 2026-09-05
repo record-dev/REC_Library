@@ -172,6 +172,44 @@
   text-align: center;
   vertical-align: baseline;
 }
+.ox-subtitle-wrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.ox-subtitle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 20px;
+  background: var(--ox-dark-6);
+  color: var(--ox-dark-0);
+  border-radius: var(--ox-radius);
+  box-shadow: var(--ox-shadow);
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+.ox-subtitle--plain {
+  background: transparent;
+  box-shadow: none;
+}
+.ox-subtitle__name {
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.ox-subtitle__text {
+  font-weight: 500;
+  line-height: 1.35;
+  overflow-wrap: break-word;
+}
+
 /* ─── progress ─── */
 
 .ox-progress-wrap {
