@@ -94,7 +94,7 @@ function Particle:draw()
 
         -- Existence confirmation
         if info.handle == -1 then
-            utils:debugPrint(("^1failed to draw particle... uid: %s^0"):find(info.uid))
+            utils:debugPrint(("^1failed to draw particle... uid: %s^0"):format(info.uid))
             info.isResolving = false
             return false
         end
@@ -121,7 +121,7 @@ function Particle:draw()
         info.handle = StartParticleFxLoopedAtCoord(
             info.name,
             info.coords.x, info.coords.y, info.coords.z,
-            100.0, 100.0, 100.0,
+            info.rotation.x, info.rotation.y, info.rotation.z,
             info.scale,
             false, -- false for now
             false, -- false for now
@@ -131,7 +131,7 @@ function Particle:draw()
 
         -- Existence confirmation
         if info.handle == -1 then
-            utils:debugPrint(("^1failed to draw particle... uid: %s^0"):find(info.uid))
+            utils:debugPrint(("^1failed to draw particle... uid: %s^0"):format(info.uid))
             info.isResolving = false
             return false
         end
@@ -144,7 +144,7 @@ function Particle:draw()
             true
         )
 
-        SetParticleFxLoopedAlpha(info.handle, info.colour.a * 1.0)
+        SetParticleFxLoopedAlpha(info.handle, info.colour.a / 255)
 
         if info.entity ~= nil then
             if StartParticleFxNonLoopedOnEntity(
