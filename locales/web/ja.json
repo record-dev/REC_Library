@@ -1,0 +1,11 @@
+{
+    "LOCALE": "ja-JP",
+    "CONFIRM": "決定",
+    "CANCEL": "キャンセル",
+    "SUBMIT": "送信",
+    "CLOSE": "閉じる",
+    "BACK": "戻る",
+    "SELECT_PLACEHOLDER": "選択...",
+    "REQUIRED": "必須",
+    "PROGRESS_CANCEL_HINT": "X でキャンセル"
+}

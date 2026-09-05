@@ -87,6 +87,32 @@ function EntityManager:unregister(uid, needDestroy)
     return true
 end
 
+---Drop the registration without touching the entity.
+---For an entity that is already gone, so its uid can be used again.
+---@param uid string Unique distinguished name
+---@return boolean
+function EntityManager:forget(uid)
+    local info = self.info
+
+    local entityData = self:getDataByUniqueId(uid)
+
+    -- Existence confirmation
+    if entityData == nil then
+        utils:debugPrint("EntityManager:forget: Entity not found with uid: " .. uid)
+        return false
+    end
+
+    -- Cancel zone name association
+    if entityData.zoneName ~= nil and info.entitiesByZone[entityData.zoneName] ~= nil then
+        info.entitiesByZone[entityData.zoneName][uid] = nil
+    end
+
+    info.entitiesByUniqueId[uid] = nil
+    utils:debugPrint("EntityManager:forget: Entity forgotten with uid: " .. uid)
+
+    return true
+end
+
 ---@param needDestroy? boolean
 ---@return boolean
 function EntityManager:unregisterAll(needDestroy)

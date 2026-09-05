@@ -1,0 +1,90 @@
+
+---[[
+---     NUI bridge
+---     One place that talks to web/, keeps the focus owners, and pushes the
+---     locales/web/<language>.json strings once the page is ready.
+---]]
+
+---@type REC_Library.Shared.Config
+local shCfg = require "@REC_Library.shared.sh_config"
+
+---@type REC_Library.Client.Utils
+local utils = require "@REC_Library.client.cl_utils"
+
+---@class REC_Library.Client.UI.Nui
+local nui = {}
+
+---@type table<string, boolean>
+local focusOwners = {}
+
+---@type boolean
+local isReady = false
+
+---@param action string
+---@param data? any
+function nui:send(action, data)
+    SendNUIMessage({ action = action, data = data, })
+end
+
+---[[
+---     Focus stays on while any owner holds it
+---]]
+---@param owner string
+---@param toggle boolean
+function nui:focus(owner, toggle)
+
+    focusOwners[owner] = toggle == true and true or nil
+
+    local hasFocus = next(focusOwners) ~= nil
+    SetNuiFocus(hasFocus, hasFocus)
+end
+
+---@param owner string
+---@return boolean
+function nui:hasFocus(owner)
+    return focusOwners[owner] == true
+end
+
+---@return boolean
+function nui:isReady()
+    return isReady
+end
+
+---@param name string
+---@return table<string, string>|nil
+local function loadStrings(name)
+
+    local raw = LoadResourceFile(GetCurrentResourceName(), ("locales/web/%s.json"):format(name))
+    if raw == nil then
+        return nil
+    end
+
+    local decoded = json.decode(raw)
+    if type(decoded) ~= "table" then
+        utils:debugPrint(("^1failed to decode locales/web/%s.json...^0"):format(name))
+        return nil
+    end
+
+    return decoded
+end
+
+RegisterNUICallback("ready", function (_, cb)
+    cb(1)
+
+    isReady = true
+    nui:send("setLocale", loadStrings(shCfg.language) or loadStrings("en"))
+end)
+
+
+
+---[[
+---     Clipboard
+---]]
+---@param text string
+function lib.setClipboard(text)
+    nui:send("clipboard", { text = tostring(text), })
+end
+
+exports("setClipboard", lib.setClipboard)
+
+return nui
