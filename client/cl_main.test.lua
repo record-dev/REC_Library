@@ -202,3 +202,108 @@ end, false)
 RegisterCommand("rl-subtitleclear", function ()
     lib.hideSubtitle()
 end, false)
+
+
+
+---[[
+---     input dialog
+---     /rl-input          every row type at once
+---     /rl-input simple   string rows only
+---]]
+lib.addCommand("rl-input", {
+    help = "Show a test input dialog (debug)",
+    params = {
+        { name = "mode", help = "simple / full (default full)", optional = true, },
+    },
+}, function (_, args)
+
+    local rows = (function ()
+        if args.mode == "simple" then
+            return { "Name", "Comment", }
+        end
+
+        return {
+            { type = "input",        label = "Name",        description = "plain text",       placeholder = "Nazu",       icon = "user",      required = true, },
+            { type = "input",        label = "Password",    password = true,                  icon = "lock", },
+            { type = "number",       label = "Amount",      description = "min 0 / max 100",  min = 0, max = 100, step = 1, default = 10, icon = "coins", },
+            { type = "checkbox",     label = "Agree",       default = true, },
+            { type = "select",       label = "Job",         options = { { value = "police", label = "Police", }, { value = "ambulance", label = "Ambulance", }, { value = "mechanic", label = "Mechanic", }, }, default = "police", clearable = true, searchable = true, },
+            { type = "multi-select", label = "Tags",        options = { { value = "a", label = "Alpha", }, { value = "b", label = "Bravo", }, { value = "c", label = "Charlie", }, }, default = { "a", "c", }, },
+            { type = "slider",       label = "Volume",      min = 0, max = 100, step = 5, default = 50, },
+            { type = "color",        label = "Color",       default = "#33cc99", },
+            { type = "date",         label = "Date",        format = "DD/MM/YYYY", returnString = true, },
+            { type = "time",         label = "Time", },
+            { type = "textarea",     label = "Memo",        autosize = true, placeholder = "free text", },
+        }
+    end)()
+
+    local values = lib.inputDialog("REC_Library input", rows, { allowCancel = true, })
+    if values == nil then
+        utils:debugPrint("^3input dialog is cancelled...^0")
+        return
+    end
+
+    for i, row in ipairs(rows) do
+        local label = type(row) == "string" and row or row.label
+        utils:debugPrint(("^2[%d] %s = %s^0"):format(i, label, json.encode(values[i])))
+    end
+end)
+
+lib.addCommand("rl-inputclose", {
+    help = "Close the input dialog from Lua (debug)",
+}, function ()
+    lib.closeInputDialog()
+end)
+
+
+
+---[[
+---     progress bar / circle
+---     /rl-progress [duration] [position]   bar with anim + prop + disabled controls
+---     /rl-progresscircle [duration]
+---]]
+---@param duration? number
+---@param position? string
+---@return REC_Library.Lib.Progress.Data
+local function buildProgressData(duration, position)
+    return {
+        duration    = duration or 5000,
+        label       = "REC_Library progress",
+        position    = position == "middle" and "middle" or "bottom",
+        canCancel   = true,
+        useWhileDead = false,
+        disable     = { move = true, car = true, combat = true, },
+        anim        = { dict = "mp_common", clip = "givetake1_a", flag = 49, },
+        prop        = { model = `prop_cs_burger_01`, bone = 60309, pos = vector3(0.02, 0.02, -0.02), rot = vector3(0.0, 0.0, 0.0), },
+    }
+end
+
+lib.addCommand("rl-progress", {
+    help = "Show a test progress bar (debug)",
+    params = {
+        { name = "duration", help = "ms (default 5000)", type = "number", optional = true, },
+        { name = "position", help = "bottom / middle (default bottom)", optional = true, },
+    },
+}, function (_, args)
+
+    local completed = lib.progressBar(buildProgressData(args.duration, args.position))
+    utils:debugPrint(("^2progress bar is finished... completed: %s^0"):format(tostring(completed)))
+end)
+
+lib.addCommand("rl-progresscircle", {
+    help = "Show a test progress circle (debug)",
+    params = {
+        { name = "duration", help = "ms (default 5000)", type = "number", optional = true, },
+        { name = "position", help = "bottom / middle (default bottom)", optional = true, },
+    },
+}, function (_, args)
+
+    local completed = lib.progressCircle(buildProgressData(args.duration, args.position))
+    utils:debugPrint(("^2progress circle is finished... completed: %s^0"):format(tostring(completed)))
+end)
+
+lib.addCommand("rl-progresscancel", {
+    help = "Cancel the running progress from Lua (debug)",
+}, function ()
+    lib.cancelProgress()
+end)
