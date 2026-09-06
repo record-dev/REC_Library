@@ -79,7 +79,10 @@ export function useInput(): InputState {
     if (data === null) return
 
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && allowCancel) close(false)
+      if (event.key !== 'Escape' || allowCancel === false) return
+      // an open select or colour panel takes this Escape, the dialog the next one
+      if (document.querySelector('[role="listbox"], .ox-dropdown, .cp__panel') !== null) return
+      close(false)
     }
 
     window.addEventListener('keydown', onKey)

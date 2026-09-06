@@ -700,12 +700,12 @@
   gap: 4px;
   max-width: 100%;
 }
-.ox-chip span {
+.ox-chip > span:first-child {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.ox-chip button {
+.ox-chip__remove {
   border: none;
   background: transparent;
   color: var(--ox-dark-2);
@@ -718,7 +718,7 @@
   align-items: center;
   justify-content: center;
 }
-.ox-chip button:hover {
+.ox-chip__remove:hover {
   color: var(--ox-dark-0);
 }
 textarea.ox-input {

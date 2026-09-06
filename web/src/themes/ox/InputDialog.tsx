@@ -263,7 +263,15 @@ function SelectControl({ row, value, hasIcon, onChange }: SelectControlProps) {
   }
 
   return (
-    <div ref={wrapper}>
+    <div
+      ref={wrapper}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' && open) {
+          event.stopPropagation()
+          setOpen(false)
+        }
+      }}
+    >
       <button
         type="button"
         className={`ox-input ox-input--select ${multiple ? 'ox-input--multi' : ''} ${hasIcon ? 'ox-input--icon' : ''} ${open ? 'ox-input--open' : ''}`}
@@ -277,8 +285,9 @@ function SelectControl({ row, value, hasIcon, onChange }: SelectControlProps) {
             {selected.map((key) => (
               <span key={key} className="ox-chip">
                 <span>{labelOf(key)}</span>
-                <button
-                  type="button"
+                <span
+                  role="button"
+                  className="ox-chip__remove"
                   aria-label={t('CLOSE')}
                   onClick={(event) => {
                     event.stopPropagation()
@@ -286,7 +295,7 @@ function SelectControl({ row, value, hasIcon, onChange }: SelectControlProps) {
                   }}
                 >
                   <i className="fa-solid fa-xmark" />
-                </button>
+                </span>
               </span>
             ))}
           </span>
