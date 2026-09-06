@@ -150,10 +150,12 @@ function Row({ row, value, onChange }: RowProps) {
 
     case 'date':
     case 'time':
+      // a placeholder keeps the label outside, the browser draws its own mm/dd/yyyy inside
       return (
         <Input
           {...common}
           type={row.type}
+          placeholder={row.placeholder ?? ' '}
           startContent={startContent}
           value={typeof value === 'string' ? value : ''}
           onValueChange={(next) => onChange(next)}

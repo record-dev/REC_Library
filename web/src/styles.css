@@ -93,6 +93,12 @@ input[type='range'].rec-slider::-webkit-slider-thumb {
 }
 
 
+/* native date / time pickers, the calendar and clock glyphs follow the colour scheme */
+input[type='date'],
+input[type='time'] {
+  color-scheme: dark;
+}
+
 /* colour rows in the input dialog (components/ColorPicker.tsx) */
 .cp__row {
   display: flex;
