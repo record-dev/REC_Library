@@ -11,6 +11,7 @@ import {
   SelectItem,
   Textarea,
 } from '@nexus-ds/react'
+import { useRef, useState, type ReactNode } from 'react'
 import ColorPicker from '../../components/ColorPicker'
 import { useInput, type InputValue } from '../../features/useInput'
 import { t } from '../../i18n'
@@ -101,29 +102,8 @@ function Row({ row, value, onChange }: RowProps) {
       )
 
     case 'select':
-    case 'multi-select': {
-      const multiple = row.type === 'multi-select'
-      const selected = multiple ? new Set(Array.isArray(value) ? value : []) : new Set(typeof value === 'string' ? [value] : [])
-      const options = Array.isArray(row.options) ? row.options : []
-
-      return (
-        <Select
-          {...common}
-          placeholder={row.placeholder ?? t('SELECT_PLACEHOLDER')}
-          selectionMode={multiple ? 'multiple' : 'single'}
-          selectedKeys={selected}
-          startContent={startContent}
-          onSelectionChange={(keys) => {
-            const list = Array.from(keys as Set<string>).map(String)
-            onChange(multiple ? list : list[0] ?? null)
-          }}
-        >
-          {options.map((option) => (
-            <SelectItem key={option.value}>{option.label ?? option.value}</SelectItem>
-          ))}
-        </Select>
-      )
-    }
+    case 'multi-select':
+      return <SelectRow row={row} value={value} onChange={onChange} common={common} startContent={startContent} />
 
     case 'slider': {
       const min = row.min ?? 0
@@ -203,4 +183,51 @@ function Row({ row, value, onChange }: RowProps) {
         />
       )
   }
+}
+
+interface SelectRowProps extends RowProps {
+  common: Record<string, unknown>
+  startContent: ReactNode
+}
+
+// react-aria opens the listbox on press start and relies on the popover's interact-outside
+// to close it, but the nexus popover exempts its own trigger from that. The open state is
+// held here so a click on the trigger while open closes it again.
+function SelectRow({ row, value, onChange, common, startContent }: SelectRowProps) {
+  const [open, setOpen] = useState(false)
+  const pressedWhileOpen = useRef(false)
+  const multiple = row.type === 'multi-select'
+  const selected = multiple ? new Set(Array.isArray(value) ? value : []) : new Set(typeof value === 'string' ? [value] : [])
+  const options = Array.isArray(row.options) ? row.options : []
+
+  return (
+    <div
+      onPointerDownCapture={(event) => {
+        pressedWhileOpen.current = open && (event.target as Element).closest('[aria-haspopup="listbox"]') !== null
+      }}
+      onClickCapture={() => {
+        if (pressedWhileOpen.current === false) return
+        pressedWhileOpen.current = false
+        setOpen(false)
+      }}
+    >
+      <Select
+        {...common}
+        placeholder={row.placeholder ?? t('SELECT_PLACEHOLDER')}
+        selectionMode={multiple ? 'multiple' : 'single'}
+        selectedKeys={selected}
+        startContent={startContent}
+        isOpen={open}
+        onOpenChange={setOpen}
+        onSelectionChange={(keys) => {
+          const list = Array.from(keys as Set<string>).map(String)
+          onChange(multiple ? list : list[0] ?? null)
+        }}
+      >
+        {options.map((option) => (
+          <SelectItem key={option.value}>{option.label ?? option.value}</SelectItem>
+        ))}
+      </Select>
+    </div>
+  )
 }
