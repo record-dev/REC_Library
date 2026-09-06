@@ -11,7 +11,7 @@ export default function ContextMenu() {
   // the wrapper owns the centering: framer-motion writes transform on the animated
   // element, so a translate class there would be overwritten and the panel would slide down
   return (
-    <div className="fixed inset-y-0 right-6 z-30 flex items-center">
+    <div className="fixed inset-y-0 right-[calc(28vw-3rem)] z-30 flex items-center">
     <AnimatePresence>
       {menu !== null && (
         <motion.div
