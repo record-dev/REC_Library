@@ -11,6 +11,7 @@ import {
   SelectItem,
   Textarea,
 } from '@nexus-ds/react'
+import ColorPicker from '../../components/ColorPicker'
 import { useInput, type InputValue } from '../../features/useInput'
 import { t } from '../../i18n'
 import { iconClass } from '../../nui'
@@ -153,13 +154,15 @@ function Row({ row, value, onChange }: RowProps) {
     case 'color':
       return (
         <div className="flex flex-col gap-1">
-          <span className="text-small">{row.label}</span>
-          <input
-            type="color"
-            className="rec-color"
+          <span className="text-small">
+            {row.label}
+            {row.required === true && <span className="ml-0.5 text-danger">*</span>}
+          </span>
+          <ColorPicker
             value={typeof value === 'string' ? value : '#000000'}
+            placeholder={row.placeholder}
             disabled={row.disabled === true}
-            onChange={(event) => onChange(event.target.value)}
+            onChange={(hex) => onChange(hex)}
           />
           {row.description !== undefined && <span className="text-tiny text-default-400">{row.description}</span>}
         </div>

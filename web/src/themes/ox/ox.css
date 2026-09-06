@@ -855,23 +855,28 @@ textarea.ox-input {
   align-items: center;
 }
 
-/* colour, a swatch in the left section and the hex in the input */
-.ox-color__swatch {
-  position: absolute;
-  left: 9px;
-  top: 9px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  overflow: hidden;
-  cursor: pointer;
+/* colour, the shared picker in the ox skin */
+.ox-root .cp__row {
+  gap: 6px;
 }
-.ox-color__swatch input {
-  position: absolute;
-  inset: -8px;
-  width: 40px;
-  height: 40px;
-  opacity: 0;
-  cursor: pointer;
+.ox-root .cp__swatch {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--ox-dark-4);
+  border-radius: var(--ox-radius);
+}
+.ox-root .cp__hex {
+  height: 36px;
+  border-width: 1px;
+  border-radius: var(--ox-radius);
+  font-family: 'Roboto Mono', monospace;
+}
+.ox-root .cp__panel {
+  border: 1px solid var(--ox-dark-4);
+  border-radius: var(--ox-radius);
+  background: var(--ox-dark-6);
+  box-shadow: var(--ox-shadow);
+}
+.ox-root .cp__sv {
+  border-radius: var(--ox-radius);
 }

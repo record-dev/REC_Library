@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import ColorPicker from '../../components/ColorPicker'
 import { useInput, type InputValue } from '../../features/useInput'
 import { t } from '../../i18n'
 import { iconClass } from '../../nui'
@@ -141,25 +142,18 @@ function Row({ row, value, onChange }: RowProps) {
       )
     }
 
-    case 'color': {
-      const current = typeof value === 'string' ? value : '#000000'
-
+    case 'color':
       return (
         <Field row={{ ...row, icon: undefined }}>
-          <input
-            type="text"
-            className="ox-input ox-input--icon"
+          <ColorPicker
+            value={typeof value === 'string' ? value : '#000000'}
             placeholder={row.placeholder}
             disabled={row.disabled === true}
-            value={current}
-            onChange={(event) => onChange(event.target.value)}
+            onChange={(hex) => onChange(hex)}
+            classNames={{ hex: 'ox-input' }}
           />
-          <div className="ox-color__swatch" style={{ background: current }}>
-            <input type="color" value={/^#[0-9a-f]{6}$/i.test(current) ? current : '#000000'} disabled={row.disabled === true} onChange={(event) => onChange(event.target.value)} />
-          </div>
         </Field>
       )
-    }
 
     case 'date':
     case 'time':
