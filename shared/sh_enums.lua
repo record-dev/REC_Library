@@ -27,6 +27,7 @@ enums.FrameworkTypes = {
 
 ---@enum REC_Library.Shared.Enums.Bank
 enums.BankTypes = {
+    rec = "rec",
     esx = "esx",
     qb = "qb",
     okok = "okok",

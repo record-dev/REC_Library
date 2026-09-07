@@ -217,6 +217,7 @@ config.inventory = getConfigValue({
 ---]]
 ---@type REC_Library.Shared.Enums.Bank
 config.bank = getConfigValue({
+    { resource = "REC_Bank", value = "rec" },
     { resource = "okokBanking", value = "okok" },
     { resource = "tgg-banking", value = "tgg" },
     { resource = "Renewed-Banking", value = "renewed" },
