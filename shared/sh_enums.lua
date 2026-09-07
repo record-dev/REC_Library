@@ -66,6 +66,7 @@ enums.DoorTypes = {
 
 ---@enum REC_Library.Shared.Enums.Medicals
 enums.MedicalTypes = {
+    rec = "rec",
     qb = "qb",
     qbx = "qbx",
     wsb_v1 = "wsb_v1",

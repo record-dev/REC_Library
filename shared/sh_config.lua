@@ -230,6 +230,7 @@ config.bank = getConfigValue({
 ---]]
 ---@type REC_Library.Shared.Enums.Medicals
 config.medical = getConfigValue({
+    { resource = "REC_Medical", value = "rec" },
     { resource = "qb-ambulancejob", value = "qb" },
     { resource = "qbx_medical", value = "qbx" },
     { resource = "wasabi_ambulance", value = "wsb_v1" },
