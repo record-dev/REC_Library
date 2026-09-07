@@ -295,6 +295,15 @@ config.notify = getConfigValue({
     { resource = "ox_lib", value = "ox" },
 })
 
+---[[
+---      Detect Clothing
+---]]
+---@type REC_Library.Shared.Enums.Clothing
+config.clothing = getConfigValue({
+    { resource = "illenium-appearance", value = "illenium" },
+    { resource = "rcore_clothing", value = "rcore" },
+})
+
 
 ---[[
 ---      You can freely change the resource names. Adjust as needed.

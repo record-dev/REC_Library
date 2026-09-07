@@ -121,6 +121,13 @@ enums.NotifyTypes = {
     custom = "custom",
 }
 
+---@enum REC_Library.Shared.Enums.Clothing
+enums.ClothingTypes = {
+    illenium = "illenium",
+    rcore = "rcore",
+    custom = "custom",
+}
+
 enums.TargetType = {}
 
 ---@enum REC_Library.Shared.Enums.TargetType.QB
