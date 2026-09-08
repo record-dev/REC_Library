@@ -128,6 +128,14 @@ enums.ClothingTypes = {
     custom = "custom",
 }
 
+---@enum REC_Library.Shared.Enums.Garage
+enums.GarageTypes = {
+    rec = "rec",
+    qbx = "qbx",
+    qb = "qb",
+    custom = "custom",
+}
+
 enums.TargetType = {}
 
 ---@enum REC_Library.Shared.Enums.TargetType.QB
