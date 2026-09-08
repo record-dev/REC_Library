@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import { t } from '../i18n'
 
 // CEF has no OS colour dialog, so <input type="color"> never opens in FiveM. This is a
 // self-contained picker: hex field, swatch, and a panel with a saturation/value square
@@ -144,7 +145,7 @@ export default function ColorPicker({ value, disabled, placeholder, onChange, cl
           type="text"
           className={`cp__hex ${classNames?.hex ?? ''}`}
           value={text}
-          placeholder={placeholder ?? '#000000'}
+          placeholder={placeholder ?? t('COLOR_PLACEHOLDER')}
           maxLength={7}
           spellCheck={false}
           disabled={disabled === true}

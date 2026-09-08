@@ -136,7 +136,7 @@ function Row({ row, value, onChange }: RowProps) {
         <div className="flex flex-col gap-1">
           <span className="text-small">
             {row.label}
-            {row.required === true && <span className="ml-0.5 text-danger">*</span>}
+            {row.required === true && <span className="ml-0.5 text-danger" title={t('REQUIRED')}>{t('REQUIRED_MARK')}</span>}
           </span>
           <ColorPicker
             value={typeof value === 'string' ? value : '#000000'}

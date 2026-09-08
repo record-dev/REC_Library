@@ -50,7 +50,7 @@ function Field({ row, children, aside }: FieldProps) {
     <div className="ox-field">
       <label className={`ox-field__label ${aside !== undefined ? 'ox-field__label--row' : ''}`}>
         {row.label}
-        {row.required === true && <span className="ox-field__required">*</span>}
+        {row.required === true && <span className="ox-field__required" title={t('REQUIRED')}>{t('REQUIRED_MARK')}</span>}
         {aside}
       </label>
       {row.description !== undefined && <p className="ox-field__description">{row.description}</p>}
@@ -104,7 +104,7 @@ function Row({ row, value, onChange }: RowProps) {
           <span>
             <span className="ox-checkbox__label">
               {row.label}
-              {row.required === true && <span className="ox-field__required">*</span>}
+              {row.required === true && <span className="ox-field__required" title={t('REQUIRED')}>{t('REQUIRED_MARK')}</span>}
             </span>
             {row.description !== undefined && <p className="ox-checkbox__description">{row.description}</p>}
           </span>
@@ -313,12 +313,12 @@ function SelectControl({ row, value, hasIcon, onChange }: SelectControlProps) {
               className="ox-input"
               style={{ marginBottom: 4 }}
               autoFocus
-              placeholder={t('SELECT_PLACEHOLDER')}
+              placeholder={t('SEARCH_PLACEHOLDER')}
               value={query}
               onChange={(event) => setQuery(event.target.value)}
             />
           )}
-          {shown.length === 0 && <p className="ox-dropdown__empty">-</p>}
+          {shown.length === 0 && <p className="ox-dropdown__empty">{t('SELECT_EMPTY')}</p>}
           {shown.map((option) => {
             const active = selected.includes(option.value)
             return (
