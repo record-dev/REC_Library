@@ -64,7 +64,7 @@ export default function ContextMenu() {
                       <span>{entry.label}</span>
                     )}
                     {typeof entry.progress === 'number' && (
-                      <Progress size="sm" aria-label={entry.label ?? ''} value={entry.progress} className="mt-1" />
+                      <Progress size="sm" aria-label={entry.label ?? t('PROGRESS')} value={entry.progress} className="mt-1" />
                     )}
                   </div>
                 ))}
@@ -112,7 +112,7 @@ function OptionRow({ option, onSelect, onHover }: OptionRowProps) {
           <p className="whitespace-pre-line break-words text-tiny text-default-500">{option.description}</p>
         )}
         {typeof option.progress === 'number' && (
-          <Progress size="sm" aria-label={option.title ?? ''} value={option.progress} className="mt-1" />
+          <Progress size="sm" aria-label={option.title ?? t('PROGRESS')} value={option.progress} className="mt-1" />
         )}
       </div>
       {showsArrow(option) && <i className="fa-solid fa-chevron-right text-tiny text-default-400" />}

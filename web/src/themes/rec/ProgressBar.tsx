@@ -1,6 +1,7 @@
 import { CircularProgress } from '@nexus-ds/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useProgress } from '../../features/useProgress'
+import { t } from '../../i18n'
 
 export default function ProgressBar() {
   const { data, value } = useProgress()
@@ -22,7 +23,7 @@ export default function ProgressBar() {
           className="flex flex-col items-center gap-2"
         >
           <CircularProgress
-            aria-label={data.label ?? 'progress'}
+            aria-label={data.label ?? t('PROGRESS')}
             value={value}
             size="lg"
             color="primary"

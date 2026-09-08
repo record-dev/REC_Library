@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useProgress } from '../../features/useProgress'
+import { t } from '../../i18n'
 
 export default function ProgressBar() {
   const { data, value } = useProgress()
@@ -20,7 +21,7 @@ export default function ProgressBar() {
                 <circle className="ox-circle__track" cx="45" cy="45" r="41.5" />
                 <circle className="ox-circle__bar" cx="45" cy="45" r="41.5" style={{ animationDuration: `${data.duration}ms` }} />
               </svg>
-              <p className="ox-circle__value ox-mono">{value}%</p>
+              <p className="ox-circle__value ox-mono">{t('PERCENT', { value })}</p>
             </div>
             {data.label !== undefined && <p className="ox-circle__label">{data.label}</p>}
           </motion.div>
