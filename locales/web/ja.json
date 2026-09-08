@@ -5,7 +5,7 @@
     "SUBMIT": "送信",
     "CLOSE": "閉じる",
     "BACK": "戻る",
-    "SELECT_PLACEHOLDER": "選択...",
+    "SELECT_PLACEHOLDER": "選択してください",
     "REQUIRED": "必須",
     "PROGRESS_CANCEL_HINT": "X でキャンセル"
 }
