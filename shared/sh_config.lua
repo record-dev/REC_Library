@@ -304,6 +304,16 @@ config.clothing = getConfigValue({
     { resource = "rcore_clothing", value = "rcore" },
 })
 
+---[[
+---      Detect Garage
+---]]
+---@type REC_Library.Shared.Enums.Garage
+config.garage = getConfigValue({
+    { resource = "REC_Garage", value = "rec" },
+    { resource = "qbx_garages", value = "qbx" },
+    { resource = "qb-garages", value = "qb" },
+})
+
 
 ---[[
 ---      You can freely change the resource names. Adjust as needed.
