@@ -363,7 +363,25 @@ function WebAuth:resolve(headers)
 end
 
 ---[[
+---     Whether a granted area covers a required one
+---     Areas nest on dots, so "settings" covers "settings.alerts.enabled" while
+---     "settings.alerts" does not cover "settings", and "*" covers everything
+---]]
+---@param granted string
+---@param required string
+---@return boolean
+local function areaCovers(granted, required)
+
+    if granted == "*" or granted == required then
+        return true
+    end
+
+    return required:sub(1, #granted + 1) == granted .. "."
+end
+
+---[[
 ---     Whether a token may perform "<area>:<action>", "*" as either half is a wildcard
+---     A granted area also covers every area nested under it (see areaCovers)
 ---]]
 ---@param tokenInfo REC_Library.Server.Class.Web.WebAuth.Token|nil
 ---@param required string
@@ -389,7 +407,7 @@ function WebAuth:hasScope(tokenInfo, required)
 
         local grantedArea, grantedAction = splitScope(granted)
 
-        local areaMatches = grantedArea == "*" or grantedArea == requiredArea
+        local areaMatches = areaCovers(grantedArea, requiredArea)
         local actionMatches = grantedAction == "*" or grantedAction == requiredAction or requiredAction == "*"
 
         if areaMatches == true and actionMatches == true then
