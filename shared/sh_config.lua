@@ -110,7 +110,7 @@ config.ui = {
         ---     the same text shown again (a loop calling showHelpText every frame) stays silent
         ---]]
         ---@type { name: string, set: string }|false
-        sound = { name = "NAV_UP_DOWN", set = "HUD_FRONTEND_DEFAULT_SOUNDSET", },
+        sound = { name = "Event_Message_Purple", set = "GTAO_FM_Events_Soundset", },
 
         ---[[
         ---     Key drawn for a GTA control token in the text ("~INPUT_CONTEXT~" becomes the [E] keycap)
