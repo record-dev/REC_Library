@@ -97,7 +97,7 @@ config.ui = {
         ---     Font size multiplier (1.0 is the default)
         ---]]
         ---@type number
-        fontScale = 1.0,
+        fontScale = 1.25,
 
         ---[[
         ---     Enter and exit animation time
@@ -173,7 +173,7 @@ config.ui = {
         ---     Font size multiplier (1.0 is the default)
         ---]]
         ---@type number
-        fontScale = 1.0,
+        fontScale = 1.25,
 
         ---[[
         ---     Display time used when duration is omitted (0 in the data keeps it until lib.hideSubtitle)

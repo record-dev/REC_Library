@@ -9,7 +9,7 @@ export const DEFAULT_HELP_TEXT_CONFIG: HelpTextConfig = {
   offsetX: '1.6vw',
   offsetY: '3vh',
   maxWidth: '380px',
-  fontScale: 1,
+  fontScale: 1.25,
   animationDuration: 200,
 }
 
@@ -17,7 +17,7 @@ export const DEFAULT_SUBTITLE_CONFIG: SubtitleConfig = {
   offsetY: '9vh',
   maxWidth: '60vw',
   background: true,
-  fontScale: 1,
+  fontScale: 1.25,
   animationDuration: 200,
 }
 
