@@ -102,6 +102,9 @@ function Vehicle:spawn()
         info.isMissionVehicle
     )
 
+    -- the entity keeps the model resident, the script no longer needs its own reference
+    SetModelAsNoLongerNeeded(info.modelHash)
+
     --Spawn confirmation
     if not info.handle or DoesEntityExist(info.handle) == false then
         info.isResolving = false -- lower processing flag
@@ -214,6 +217,10 @@ function Vehicle:destroy()
 
     -- Delete vehicle
     DeleteVehicle(info.handle)
+
+    -- Deleted so no longer needed
+    info.handle = 0
+    info.netId = nil
 
     -- lower running flag
     info.isResolving = false

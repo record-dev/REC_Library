@@ -57,6 +57,27 @@ function callback._timeout()
 end
 
 ---[[
+---     Drop the callback stored under key after the timeout, onExpire cleans the side specific state
+---]]
+---@param key string
+---@param onExpire? fun()
+function callback._expire(key, onExpire)
+
+    SetTimeout(timeout, function ()
+        if pending[key] == nil then
+            return
+        end
+
+        pending[key] = nil
+        print(("^3callback timed out... key: %s^0"):format(key))
+
+        if onExpire ~= nil then
+            onExpire()
+        end
+    end)
+end
+
+---[[
 ---     Wait for the answer stored under key, nil after the timeout
 ---]]
 ---@param key string

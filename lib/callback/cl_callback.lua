@@ -72,6 +72,7 @@ function callback.trigger(name, delay, cb, ...)
 
     local key = callback._key()
     pending[key] = cb
+    callback._expire(key)
 
     TriggerServerEvent(callback._event(name), key, ...)
 end

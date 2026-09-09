@@ -7,8 +7,13 @@ local clientFunctions = require "@REC_Library.client.cl_functions"
 
 ---@class REC_Library.Client.Class.Effect.Particle
 ---@field info REC_Library.Shared.Class.Effect.ParticleConfigBuilder
+---@field holdsAsset boolean
 local Particle = {}
 Particle.__index = Particle
+
+-- how many instances loaded each asset through setup()
+---@type table<string, integer>
+local assetRefs = {}
 
 ---instantiation
 ---@param config REC_Library.Shared.Class.Effect.ParticleConfigBuilder
@@ -16,6 +21,7 @@ Particle.__index = Particle
 function Particle:new(config)
     local instance = setmetatable({}, self)
     instance.info = config
+    instance.holdsAsset = false
     return instance
 end
 
@@ -43,6 +49,12 @@ function Particle:setup()
         utils:debugPrint("Failed to load particle asset: " .. info.asset)
         info.isResolving = false
         return false
+    end
+
+    -- count the reference once per instance
+    if self.holdsAsset == false then
+        assetRefs[info.asset] = (assetRefs[info.asset] or 0) + 1
+        self.holdsAsset = true
     end
 
     -- lower flag in progress
@@ -201,6 +213,17 @@ function Particle:destroy()
 
     if info.isLooped then
         StopParticleFxLooped(info.handle, true)
+    end
+
+    -- release the asset once nobody loaded through setup() needs it
+    if self.holdsAsset == true then
+        self.holdsAsset = false
+        assetRefs[info.asset] = (assetRefs[info.asset] or 1) - 1
+
+        if assetRefs[info.asset] <= 0 then
+            assetRefs[info.asset] = nil
+            RemoveNamedPtfxAsset(info.asset)
+        end
     end
 
     -- lower flag in progress

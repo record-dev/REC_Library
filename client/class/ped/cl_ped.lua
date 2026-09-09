@@ -112,6 +112,9 @@ function Ped:spawn()
         true
     )
 
+    -- the entity keeps the model resident, the script no longer needs its own reference
+    SetModelAsNoLongerNeeded(info.modelHash)
+
     --Spawn confirmation
     if not info.handle or DoesEntityExist(info.handle) == false then
         info.isResolving = false -- lower processing flag

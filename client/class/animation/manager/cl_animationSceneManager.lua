@@ -153,7 +153,13 @@ function AnimationSceneManager:clear()
         DeleteEntity(propActor.handle)
     end
 
+    -- setup() spawns the props again, so drop the dead handles
+    info.propActors = {}
+
+    RemoveAnimDict(info.animDict)
+
     info.currentAnimKey = nil
+    info.isSetuped = false
 
     return true
 end

@@ -169,6 +169,9 @@ function Object:spawn(isInternalReplaceCall)
 
     end
 
+    -- the entity keeps the model resident, the script no longer needs its own reference
+    SetModelAsNoLongerNeeded(info.modelHash)
+
     --Wait until fully spawned
     local timeout = 1200
     while DoesEntityExist(info.handle) == false do
@@ -227,7 +230,7 @@ function Object:spawn(isInternalReplaceCall)
         if info.roomHashKey ~= 0 then
             local interiorId = GetInteriorFromEntity(info.handle)
 
-            timeout = 1200
+            local timeout = 1200
             while interiorId == 0 do
                 Wait(10)
                 interiorId = GetInteriorFromEntity(info.handle)

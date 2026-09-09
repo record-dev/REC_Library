@@ -102,6 +102,11 @@ function Train:spawn()
         true
     )
 
+    -- the train keeps its models resident, the script no longer needs its own references
+    for _, modelHash in ipairs(info.modelHashs) do
+        SetModelAsNoLongerNeeded(modelHash)
+    end
+
     -- Wait for spawn to complete
     local currentTimeout = info.spawnTimeout
     while not DoesEntityExist(info.handle) do

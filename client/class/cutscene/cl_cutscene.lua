@@ -39,6 +39,7 @@ function Cutscene:play()
     -- Load cutscene
     if not self:requestCutscene(info.name) then
         utils:debugPrint("[Cutscene:play]: Failed to request cutscene with name " .. tostring(info.name))
+        RemoveCutscene()
         info.isResolving = false
         return false
     end
@@ -147,6 +148,9 @@ function Cutscene:restore()
     if not self:destroy() then
         utils:debugPrint("[Cutscene:restore]: destroy error")
     end
+
+    -- hand the cutscene data back to the streamer
+    RemoveCutscene()
 
     -- Force perspective to third person
     SetFollowPedCamViewMode(2)

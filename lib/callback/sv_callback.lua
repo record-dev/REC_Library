@@ -59,6 +59,9 @@ function callback.trigger(name, playerId, cb, ...)
     local key = callback._key()
     pending[key] = cb
     pendingSource[key] = playerId
+    callback._expire(key, function ()
+        pendingSource[key] = nil
+    end)
 
     TriggerClientEvent(callback._event(name), playerId, key, ...)
 end
@@ -82,7 +85,12 @@ function callback.await(name, playerId, ...)
 
     TriggerClientEvent(callback._event(name), playerId, key, ...)
 
-    return callback._await(key)
+    local result = table.pack(callback._await(key))
+
+    -- the timeout only clears the shared pending table
+    pendingSource[key] = nil
+
+    return table.unpack(result, 1, result.n)
 end
 
 ---[[
