@@ -24,7 +24,7 @@ export const DEFAULT_SUBTITLE_CONFIG: SubtitleConfig = {
 export const DEFAULT_GAUGE_CONFIG: GaugeConfig = {
   position: 'bottom-center',
   offsetX: '1.6vw',
-  offsetY: '12vh',
+  offsetY: '13.4vh',
   width: '240px',
   fontScale: 1,
   animationDuration: 200,

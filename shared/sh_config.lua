@@ -202,11 +202,11 @@ config.ui = {
             ---@type string
             x = "1.6vw",
             ---@type string
-            y = "12vh",
+            y = "13.4vh",
         },
 
         ---[[
-        ---     Width of a bar gauge (CSS units)
+        ---     Width of a bar gauge (CSS units), each gauge can override it with data.width
         ---]]
         ---@type string
         width = "240px",

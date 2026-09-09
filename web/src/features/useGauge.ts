@@ -19,6 +19,8 @@ function normalize(raw: GaugeData, fallbackPosition: HelpTextPosition): GaugeDat
     percent: Math.min(100, Math.max(0, Math.round(percent))),
     position: HELP_TEXT_POSITIONS.includes(raw.position) ? raw.position : fallbackPosition,
     shape: raw.shape === 'ring' ? 'ring' : 'bar',
+    variant: raw.variant === 'plain' ? 'plain' : 'card',
+    width: typeof raw.width === 'string' && raw.width !== '' ? raw.width : undefined,
     showValue: raw.showValue === true,
     hideWhenEmpty: raw.hideWhenEmpty === true,
   }

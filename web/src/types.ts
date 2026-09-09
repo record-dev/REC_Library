@@ -159,6 +159,7 @@ export interface SubtitleConfig {
 // ─── gauge ────────────────────────────
 
 export type GaugeShape = 'bar' | 'ring'
+export type GaugeVariant = 'card' | 'plain'
 
 /** shaped by cl_gauge.lua, percent is already clamped and rounded */
 export interface GaugeData {
@@ -169,6 +170,8 @@ export interface GaugeData {
   color: string
   position: HelpTextPosition
   shape: GaugeShape
+  variant: GaugeVariant
+  width?: string
   showValue: boolean
   hideWhenEmpty: boolean
 }

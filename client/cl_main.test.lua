@@ -332,7 +332,8 @@ end
 
 ---@param shape? string
 ---@param position? string
-local function startGauge(shape, position)
+---@param variant? string
+local function startGauge(shape, position, variant)
 
     local id = lib.showGauge({
         id            = "rl-test",
@@ -342,7 +343,9 @@ local function startGauge(shape, position)
         color         = "#ebebeb",
         position      = position,
         shape         = shape == "ring" and "ring" or "bar",
-        showValue     = true,
+        variant       = variant == "plain" and "plain" or "card",
+        width         = variant == "plain" and "10vw" or nil,
+        showValue     = variant ~= "plain",
         hideWhenEmpty = false,
     })
 
@@ -380,9 +383,10 @@ lib.addCommand("rl-gauge", {
     params = {
         { name = "shape", help = "bar / ring (default bar)", optional = true, },
         { name = "position", help = "top-left ... bottom-right (default config)", optional = true, },
+        { name = "variant", help = "card / plain (default card, plain is the native look)", optional = true, },
     },
 }, function (_, args)
-    startGauge(args.shape, args.position)
+    startGauge(args.shape, args.position, args.variant)
 end)
 
 lib.addCommand("rl-gaugestatic", {

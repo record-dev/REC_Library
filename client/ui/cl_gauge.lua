@@ -31,6 +31,8 @@ local text = require "@REC_Library.client.ui.cl_text"
 ---@field color? string fill colour (defaults to config.ui.gauge.color)
 ---@field position? REC_Library.Shared.Enums.HelpTextPosition
 ---@field shape? REC_Library.Lib.Gauge.Shape default "bar"
+---@field variant? REC_Library.Lib.Gauge.Variant "card" (default) draws the themed box, "plain" only the bar and the wording like the native DrawRect meter
+---@field width? string CSS width of a bar (defaults to config.ui.gauge.width)
 ---@field showValue? boolean draw the percentage next to the label
 ---@field hideWhenEmpty? boolean keep the gauge registered but off screen while the value is 0
 
@@ -44,6 +46,7 @@ local text = require "@REC_Library.client.ui.cl_text"
 ---@field hideWhenEmpty? boolean
 
 ---@alias REC_Library.Lib.Gauge.Shape "bar" | "ring"
+---@alias REC_Library.Lib.Gauge.Variant "card" | "plain"
 
 ---@class REC_Library.Lib.Gauge.Entry
 ---@field id string
@@ -53,6 +56,8 @@ local text = require "@REC_Library.client.ui.cl_text"
 ---@field color string
 ---@field position REC_Library.Shared.Enums.HelpTextPosition
 ---@field shape REC_Library.Lib.Gauge.Shape
+---@field variant REC_Library.Lib.Gauge.Variant
+---@field width string|nil
 ---@field showValue boolean
 ---@field hideWhenEmpty boolean
 
@@ -67,6 +72,9 @@ end)()
 
 ---@type table<string, true>
 local validShapes = { bar = true, ring = true, }
+
+---@type table<string, true>
+local validVariants = { card = true, plain = true, }
 
 ---@type table<string, { entry: REC_Library.Lib.Gauge.Entry, max: number }>
 local gauges = {}
@@ -143,6 +151,8 @@ local function build(data)
         color         = type(data.color) == "string" and data.color or gaugeCfg.color,
         position      = validPositions[data.position] == true and data.position or gaugeCfg.position,
         shape         = validShapes[data.shape] == true and data.shape or "bar",
+        variant       = validVariants[data.variant] == true and data.variant or "card",
+        width         = type(data.width) == "string" and data.width or nil,
         showValue     = data.showValue == true,
         hideWhenEmpty = data.hideWhenEmpty == true,
     }, max
@@ -158,6 +168,8 @@ local function same(a, b)
         and a.color == b.color
         and a.position == b.position
         and a.shape == b.shape
+        and a.variant == b.variant
+        and a.width == b.width
         and a.showValue == b.showValue
         and a.hideWhenEmpty == b.hideWhenEmpty
 end
@@ -222,6 +234,8 @@ function lib.updateGauge(id, patch)
         color         = type(patch.color) == "string" and patch.color or previous.color,
         position      = previous.position,
         shape         = previous.shape,
+        variant       = previous.variant,
+        width         = previous.width,
         showValue     = toFlag(patch.showValue, previous.showValue),
         hideWhenEmpty = toFlag(patch.hideWhenEmpty, previous.hideWhenEmpty),
     }

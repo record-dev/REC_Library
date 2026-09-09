@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import PlainGauge from '../../components/PlainGauge'
 import { RING_LENGTH, RING_RADIUS, groupGauges, useGauges, type GaugeEntry } from '../../features/useGauge'
 import { helpTextHiddenState, helpTextWrapperStyle } from '../../features/useHelpText'
 import { t } from '../../i18n'
@@ -11,7 +12,7 @@ function Bar({ entry, config }: { entry: GaugeEntry; config: GaugeConfig }) {
   const hasHeader = data.label !== undefined || icon !== undefined || data.showValue === true
 
   return (
-    <div className="ox-gauge" style={{ width: config.width, fontSize: `${14 * config.fontScale}px` }}>
+    <div className="ox-gauge" style={{ width: data.width ?? config.width, fontSize: `${14 * config.fontScale}px` }}>
       {hasHeader && (
         <div className="ox-gauge__header">
           {icon !== undefined && <i className={`${icon} fa-fw ox-gauge__icon`} style={{ color: data.color }} />}
@@ -82,7 +83,9 @@ export default function Gauge() {
                   exit={hidden}
                   transition={{ duration: config.animationDuration / 1000 }}
                 >
-                  {entry.data.shape === 'ring' ? <Ring entry={entry} config={config} /> : <Bar entry={entry} config={config} />}
+                  {entry.data.variant === 'plain' && <PlainGauge entry={entry} config={config} />}
+                  {entry.data.variant !== 'plain' && entry.data.shape === 'ring' && <Ring entry={entry} config={config} />}
+                  {entry.data.variant !== 'plain' && entry.data.shape !== 'ring' && <Bar entry={entry} config={config} />}
                 </motion.div>
               )
             })}
