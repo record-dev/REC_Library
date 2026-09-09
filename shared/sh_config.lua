@@ -106,6 +106,13 @@ config.ui = {
         animationDuration = 200, -- ms
 
         ---[[
+        ---     Frontend sound played when a help text appears or its wording changes, false for silence
+        ---     the same text shown again (a loop calling showHelpText every frame) stays silent
+        ---]]
+        ---@type { name: string, set: string }|false
+        sound = { name = "NAV_UP_DOWN", set = "HUD_FRONTEND_DEFAULT_SOUNDSET", },
+
+        ---[[
         ---     Key drawn for a GTA control token in the text ("~INPUT_CONTEXT~" becomes the [E] keycap)
         ---     a token missing here is drawn with its control name
         ---]]

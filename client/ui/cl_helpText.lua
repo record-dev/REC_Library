@@ -102,12 +102,22 @@ function lib.showHelpText(data)
         return nil
     end
 
+    expire()
+
+    -- a new card or new wording, not the same text pushed again from a loop
+    local isNew = current == nil or current.entry.text ~= entry.text
+
     current = {
         entry     = entry,
         expiresAt = text:expiresAt(entry.duration),
     }
 
     nui:send("helpText", entry)
+
+    local sound = helpTextCfg.sound
+    if isNew == true and sound ~= false and sound ~= nil then
+        PlaySoundFrontend(-1, sound.name, sound.set, true)
+    end
 
     return entry.id
 end
