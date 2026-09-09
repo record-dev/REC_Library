@@ -63,6 +63,9 @@ function text:formatControls(value)
         return ("[%s]"):format(shCfg.ui.helpText.inputKeys[name] or name)
     end)
 
+    -- a blip sprite has no glyph outside the game's own text, drop it and the space after it
+    formatted = formatted:gsub("~BLIP_[%w_]+~%s*", "")
+
     return formatted
 end
 
