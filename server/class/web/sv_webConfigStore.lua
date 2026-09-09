@@ -480,25 +480,43 @@ end
 
 ---[[
 ---     Put every setting back to what the declaration ships
+---     With a guard only the settings it accepts are touched, the rest keep their override
 ---]]
 ---@param actor? string
+---@param canWrite? REC_Library.Server.Class.Web.WebConfigStore.Guard
 ---@return integer count of settings that were overridden
-function WebConfigStore:resetAll(actor)
+function WebConfigStore:resetAll(actor, canWrite)
 
-    ---@type integer
-    local count = 0
+    ---@type string[]
+    local paths = {}
 
     for path in pairs(self.overrides) do
-        self:apply(path, self.defaults[path])
-        count = count + 1
+        if canWrite == nil or canWrite(self.settings[path]) == true then
+            paths[#paths+1] = path
+        end
     end
 
-    self.overrides = {}
+    for _, path in ipairs(paths) do
+        self:apply(path, self.defaults[path])
+        self.overrides[path] = nil
+    end
+
+    ---@type integer
+    local count = #paths
 
     if self.persistent == true and count > 0 then
-        MySQL.update.await(("DELETE FROM `%s` WHERE `resource` = ?"):format(TABLE_NAME), {
-            self.resourceName,
-        })
+        if canWrite == nil then
+            MySQL.update.await(("DELETE FROM `%s` WHERE `resource` = ?"):format(TABLE_NAME), {
+                self.resourceName,
+            })
+        else
+            for _, path in ipairs(paths) do
+                MySQL.update.await(("DELETE FROM `%s` WHERE `resource` = ? AND `path` = ?"):format(TABLE_NAME), {
+                    self.resourceName,
+                    path,
+                })
+            end
+        end
     end
 
     self:debugPrint(("^2successful to reset every config override... count: %d actor: %s^0"):format(count, tostring(actor)))
@@ -537,8 +555,9 @@ end
 ---]]
 ---@param payload any
 ---@param actor? string
+---@param canWrite? REC_Library.Server.Class.Web.WebConfigStore.Guard entries it refuses land in failed
 ---@return REC_Library.Server.Class.Web.WebConfigStore.ImportResult
-function WebConfigStore:import(payload, actor)
+function WebConfigStore:import(payload, actor, canWrite)
 
     ---@type REC_Library.Server.Class.Web.WebConfigStore.ImportResult
     local result = { applied = 0, skipped = 0, failed = {}, }
@@ -555,8 +574,14 @@ function WebConfigStore:import(payload, actor)
 
     for path, value in pairs(payload.values) do
 
-        if self.settings[path] == nil then
+        local setting = self.settings[path]
+        if setting == nil then
             result.skipped = result.skipped + 1
+            goto continue
+        end
+
+        if canWrite ~= nil and canWrite(setting) == false then
+            result.failed[#result.failed+1] = { path = path, reason = ("needs the %s:write scope"):format(setting.area), }
             goto continue
         end
 
@@ -602,6 +627,81 @@ function WebConfigStore:isSameAsDefault(path, value)
     end
 
     return true
+end
+
+---[[
+---     The permission area one setting declared, as "<area>:<action>"
+---]]
+---@param path any
+---@param action "read" | "write"
+---@return string|nil nil when the path is not a declared setting
+function WebConfigStore:scopeOf(path, action)
+
+    local setting = type(path) == "string" and self.settings[path] or nil
+    if setting == nil then
+        return nil
+    end
+
+    return ("%s:%s"):format(setting.area, action)
+end
+
+---[[
+---     Every area the settings declare, in declaration order and without duplicates
+---     Pass config.web.areas to get it back with the setting areas it did not list yet,
+---     which is the list toSession needs for the panel to gate each row on its own
+---]]
+---@param base? string[]
+---@return string[]
+function WebConfigStore:mergeAreas(base)
+
+    ---@type string[]
+    local areas = {}
+
+    ---@type table<string, true>
+    local seen = {}
+
+    for _, area in ipairs(base or {}) do
+        if seen[area] == nil then
+            seen[area] = true
+            areas[#areas+1] = area
+        end
+    end
+
+    ---@type string[]
+    local ordered = {}
+    for path in pairs(self.settings) do
+        ordered[#ordered+1] = path
+    end
+    table.sort(ordered, function (a, b)
+        return self.order[a] < self.order[b]
+    end)
+
+    for _, path in ipairs(ordered) do
+        local area = self.settings[path].area
+        if seen[area] == nil then
+            seen[area] = true
+            areas[#areas+1] = area
+        end
+    end
+
+    return areas
+end
+
+---[[
+---     Whether the guard accepts at least one declared setting
+---     The gate for a bulk write (import / reset all), which may touch any of them
+---]]
+---@param canWrite REC_Library.Server.Class.Web.WebConfigStore.Guard
+---@return boolean
+function WebConfigStore:hasWritable(canWrite)
+
+    for _, setting in pairs(self.settings) do
+        if canWrite(setting) == true then
+            return true
+        end
+    end
+
+    return false
 end
 
 ---[[
@@ -659,6 +759,11 @@ return WebConfigStore
 ---@field persistent? boolean false keeps the overrides in memory only
 ---@field onChange? fun(self: REC_Library.Server.Class.Web.WebConfigStore, path: string, value: any)
 ---@field debug? boolean
+
+---[[
+---     Whether the caller may write one setting, the resource answers it with its token
+---]]
+---@alias REC_Library.Server.Class.Web.WebConfigStore.Guard fun(setting: REC_Library.Server.Class.Web.Setting): boolean
 
 ---@class REC_Library.Server.Class.Web.WebConfigStore.Export
 ---@field resource string
