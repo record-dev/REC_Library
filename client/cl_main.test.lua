@@ -307,3 +307,111 @@ lib.addCommand("rl-progresscancel", {
 }, function ()
     lib.cancelProgress()
 end)
+
+---[[
+---     Gauge
+---]]
+---@type boolean
+local gaugeRunning = false
+
+---@param value number 0 to 1
+---@return string colour
+---@return string label
+local function gaugeLook(value)
+
+    if value >= 1.0 then
+        return "#d63031", "SPOTTED"
+    end
+
+    if value >= 0.6 then
+        return "#e19822", "SEARCHING"
+    end
+
+    return "#ebebeb", "WATCHING"
+end
+
+---@param shape? string
+---@param position? string
+local function startGauge(shape, position)
+
+    local id = lib.showGauge({
+        id            = "rl-test",
+        value         = 0.0,
+        label         = "WATCHING",
+        icon          = "eye",
+        color         = "#ebebeb",
+        position      = position,
+        shape         = shape == "ring" and "ring" or "bar",
+        showValue     = true,
+        hideWhenEmpty = false,
+    })
+
+    if gaugeRunning == true then
+        return
+    end
+
+    gaugeRunning = true
+
+    CreateThread(function ()
+
+        ---@type number
+        local value, step = 0.0, 0.02
+
+        while gaugeRunning == true do
+
+            value = value + step
+
+            if value >= 1.0 then
+                value, step = 1.0, -step
+            elseif value <= 0.0 then
+                value, step = 0.0, -step
+            end
+
+            local colour, label = gaugeLook(value)
+            lib.updateGauge(id, { value = value, color = colour, label = label, })
+
+            Citizen.Wait(value >= 1.0 and 1500 or 150)
+        end
+    end)
+end
+
+lib.addCommand("rl-gauge", {
+    help = "Show a test gauge that fills and drains (debug)",
+    params = {
+        { name = "shape", help = "bar / ring (default bar)", optional = true, },
+        { name = "position", help = "top-left ... bottom-right (default config)", optional = true, },
+    },
+}, function (_, args)
+    startGauge(args.shape, args.position)
+end)
+
+lib.addCommand("rl-gaugestatic", {
+    help = "Show a second, still gauge next to the animated one (debug)",
+    params = {
+        { name = "percent", help = "0 - 100 (default 75)", type = "number", optional = true, },
+    },
+}, function (_, args)
+
+    lib.showGauge({
+        id        = "rl-static",
+        value     = args.percent or 75,
+        max       = 100,
+        label     = "Filter",
+        icon      = "mask-ventilator",
+        color     = "#00ff88",
+        position  = "right-center",
+        shape     = "ring",
+        showValue = true,
+    })
+end)
+
+lib.addCommand("rl-gaugehide", {
+    help = "Stop and hide every test gauge (debug)",
+}, function ()
+
+    gaugeRunning = false
+    lib.hideGauge()
+
+    local isOpen, ids = lib.isGaugeOpen()
+    utils:debugPrint(("^2gauges hidden... isOpen: %s, remaining: %d^0"):format(tostring(isOpen), #ids))
+end)
