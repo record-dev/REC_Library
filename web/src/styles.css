@@ -86,6 +86,14 @@ html.light {
   animation-fill-mode: forwards;
 }
 
+/* a gauge glides between the values Lua pushes instead of jumping */
+.rec-gauge-fill {
+  transition: width 150ms linear, background-color 200ms ease;
+}
+.rec-gauge-ring {
+  transition: stroke-dashoffset 150ms linear, stroke 200ms ease;
+}
+
 /* slider rows in the input dialog */
 input[type='range'].rec-slider {
   -webkit-appearance: none;

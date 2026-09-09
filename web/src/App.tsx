@@ -40,6 +40,7 @@ export default function App() {
       <Skin.TextUI />
       <Skin.HelpText />
       <Skin.Subtitle />
+      <Skin.Gauge />
       <Skin.ProgressBar />
       <Skin.ContextMenu />
       <Skin.AlertDialog />

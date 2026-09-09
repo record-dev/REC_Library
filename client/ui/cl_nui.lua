@@ -99,7 +99,7 @@ exports("getTheme", lib.getTheme)
 ---@return table
 local function uiConfig()
 
-    local helpTextCfg, subtitleCfg = shCfg.ui.helpText, shCfg.ui.subtitle
+    local helpTextCfg, subtitleCfg, gaugeCfg = shCfg.ui.helpText, shCfg.ui.subtitle, shCfg.ui.gauge
 
     return {
         helpText = {
@@ -116,6 +116,14 @@ local function uiConfig()
             background        = subtitleCfg.background,
             fontScale         = subtitleCfg.fontScale,
             animationDuration = subtitleCfg.animationDuration,
+        },
+        gauge = {
+            position          = gaugeCfg.position,
+            offsetX           = gaugeCfg.offset.x,
+            offsetY           = gaugeCfg.offset.y,
+            width             = gaugeCfg.width,
+            fontScale         = gaugeCfg.fontScale,
+            animationDuration = gaugeCfg.animationDuration,
         },
     }
 end

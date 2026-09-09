@@ -12,7 +12,7 @@ export default function HelpText() {
   const hidden = helpTextHiddenState(position)
 
   return (
-    <div className="ox-helptext-wrap" style={helpTextWrapperStyle(position, config)}>
+    <div className="ox-helptext-wrap" style={helpTextWrapperStyle(position, config, config.maxWidth)}>
       <AnimatePresence mode="wait">
         {entry !== null && data !== null && (
           <motion.div

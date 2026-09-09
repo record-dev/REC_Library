@@ -179,6 +179,9 @@ local moduleIndex = {
     hideHelpText = "helpText",
     showSubtitle = "subtitle",
     hideSubtitle = "subtitle",
+    showGauge = "gauge",
+    updateGauge = "gauge",
+    hideGauge = "gauge",
 
     points = "points",
 
@@ -222,6 +225,10 @@ local uiExports = {
     showSubtitle = true,
     hideSubtitle = true,
     isSubtitleOpen = true,
+    showGauge = true,
+    updateGauge = true,
+    hideGauge = true,
+    isGaugeOpen = true,
     setClipboard = true,
     getTheme = true,
 }

@@ -33,6 +33,7 @@ client_scripts {
     'client/ui/cl_text.lua',
     'client/ui/cl_helpText.lua',
     'client/ui/cl_subtitle.lua',
+    'client/ui/cl_gauge.lua',
     'client/*.lua'
 }
 

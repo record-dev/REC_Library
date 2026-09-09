@@ -82,6 +82,38 @@ const SAMPLES: { label: string; run: () => void }[] = [
       }),
   },
   { label: 'hide subtitle', run: () => send('hideSubtitle', {}) },
+  {
+    label: 'gauge bar',
+    run: () =>
+      send('gauge', {
+        id: 'sample-gauge',
+        percent: 42,
+        label: '警戒中',
+        icon: 'eye',
+        color: '#e19822',
+        position: 'bottom-center',
+        shape: 'bar',
+        showValue: true,
+        hideWhenEmpty: false,
+      }),
+  },
+  {
+    label: 'gauge ring',
+    run: () =>
+      send('gauge', {
+        id: 'sample-ring',
+        percent: 75,
+        label: 'Filter',
+        icon: 'mask-ventilator',
+        color: '#00ff88',
+        position: 'right-center',
+        shape: 'ring',
+        showValue: true,
+        hideWhenEmpty: false,
+      }),
+  },
+  { label: 'gauge fill', run: () => send('gauge', { id: 'sample-gauge', percent: 100, label: '発見された', icon: 'eye', color: '#d63031', position: 'bottom-center', shape: 'bar', showValue: true, hideWhenEmpty: false }) },
+  { label: 'hide gauges', run: () => send('hideGauge', {}) },
   { label: 'locale ja', run: () => send('setLocale', { CONFIRM: '決定', CANCEL: 'キャンセル', SUBMIT: '送信' }) },
   { label: 'theme rec', run: () => send('setTheme', { name: 'rec' }) },
   { label: 'theme ox', run: () => send('setTheme', { name: 'ox', options: { primaryColor: 'blue', primaryShade: 8 } }) },

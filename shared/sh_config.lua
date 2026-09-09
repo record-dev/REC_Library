@@ -187,6 +187,48 @@ config.ui = {
         ---@type integer
         animationDuration = 200, -- ms
     },
+
+    ---[[
+    ---     Gauge (a value between 0 and max drawn as a bar or a ring), several can be on screen at once
+    ---]]
+    gauge = {
+
+        ---[[
+        ---     Default position (each gauge can override it with data.position), gauges at the same position stack
+        ---]]
+        ---@type REC_Library.Shared.Enums.HelpTextPosition
+        position = "bottom-center",
+        offset = {
+            ---@type string
+            x = "1.6vw",
+            ---@type string
+            y = "12vh",
+        },
+
+        ---[[
+        ---     Width of a bar gauge (CSS units)
+        ---]]
+        ---@type string
+        width = "240px",
+
+        ---[[
+        ---     Colour of the fill when the caller omits color
+        ---]]
+        ---@type string
+        color = "#e2e8f0",
+
+        ---[[
+        ---     Font size multiplier (1.0 is the default)
+        ---]]
+        ---@type number
+        fontScale = 1.0,
+
+        ---[[
+        ---     Enter and exit animation time
+        ---]]
+        ---@type integer
+        animationDuration = 200, -- ms
+    },
 }
 
 ---[[

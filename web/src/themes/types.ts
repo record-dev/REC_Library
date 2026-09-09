@@ -5,6 +5,7 @@ export interface ThemeComponents {
   TextUI: ComponentType
   HelpText: ComponentType
   Subtitle: ComponentType
+  Gauge: ComponentType
   ProgressBar: ComponentType
   ContextMenu: ComponentType
   AlertDialog: ComponentType

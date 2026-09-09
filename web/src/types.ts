@@ -156,7 +156,35 @@ export interface SubtitleConfig {
   animationDuration: number
 }
 
+// ─── gauge ────────────────────────────
+
+export type GaugeShape = 'bar' | 'ring'
+
+/** shaped by cl_gauge.lua, percent is already clamped and rounded */
+export interface GaugeData {
+  id: string
+  percent: number
+  label?: string
+  icon?: string
+  color: string
+  position: HelpTextPosition
+  shape: GaugeShape
+  showValue: boolean
+  hideWhenEmpty: boolean
+}
+
+/** built by cl_nui.lua from config.ui.gauge */
+export interface GaugeConfig {
+  position: HelpTextPosition
+  offsetX: string
+  offsetY: string
+  width: string
+  fontScale: number
+  animationDuration: number
+}
+
 export interface HudConfig {
   helpText: HelpTextConfig
   subtitle: SubtitleConfig
+  gauge: GaugeConfig
 }

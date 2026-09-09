@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNuiEvent } from '../nui'
-import { HELP_TEXT_POSITIONS, type HelpTextConfig, type HudConfig, type SubtitleConfig } from '../types'
+import { HELP_TEXT_POSITIONS, type GaugeConfig, type HelpTextConfig, type HudConfig, type SubtitleConfig } from '../types'
 
 // Defaults mirror config.ui in shared/sh_config.lua, so the overlays look right during the
 // few frames before setUiConfig arrives (and in the browser playground).
@@ -21,9 +21,19 @@ export const DEFAULT_SUBTITLE_CONFIG: SubtitleConfig = {
   animationDuration: 200,
 }
 
+export const DEFAULT_GAUGE_CONFIG: GaugeConfig = {
+  position: 'bottom-center',
+  offsetX: '1.6vw',
+  offsetY: '12vh',
+  width: '240px',
+  fontScale: 1,
+  animationDuration: 200,
+}
+
 export const DEFAULT_HUD_CONFIG: HudConfig = {
   helpText: DEFAULT_HELP_TEXT_CONFIG,
   subtitle: DEFAULT_SUBTITLE_CONFIG,
+  gauge: DEFAULT_GAUGE_CONFIG,
 }
 
 /** a number that survives a missing or unusable value from Lua */
@@ -45,6 +55,7 @@ export function toHudConfig(raw: unknown): HudConfig {
   const incoming = toObject<HudConfig>(raw)
   const helpText = { ...DEFAULT_HELP_TEXT_CONFIG, ...toObject<HelpTextConfig>(incoming.helpText) }
   const subtitle = { ...DEFAULT_SUBTITLE_CONFIG, ...toObject<SubtitleConfig>(incoming.subtitle) }
+  const gauge = { ...DEFAULT_GAUGE_CONFIG, ...toObject<GaugeConfig>(incoming.gauge) }
 
   return {
     helpText: {
@@ -57,6 +68,12 @@ export function toHudConfig(raw: unknown): HudConfig {
       ...subtitle,
       fontScale: toNumber(subtitle.fontScale, DEFAULT_SUBTITLE_CONFIG.fontScale, 0.1),
       animationDuration: toNumber(subtitle.animationDuration, DEFAULT_SUBTITLE_CONFIG.animationDuration, 0),
+    },
+    gauge: {
+      ...gauge,
+      position: HELP_TEXT_POSITIONS.includes(gauge.position) ? gauge.position : DEFAULT_GAUGE_CONFIG.position,
+      fontScale: toNumber(gauge.fontScale, DEFAULT_GAUGE_CONFIG.fontScale, 0.1),
+      animationDuration: toNumber(gauge.animationDuration, DEFAULT_GAUGE_CONFIG.animationDuration, 0),
     },
   }
 }

@@ -24,9 +24,15 @@ export function useHelpText(): { entry: TextEntry<HelpTextData> | null; config: 
   return { entry, config }
 }
 
+/** the offsets any edge anchored overlay reads from its config */
+export interface EdgeLayout {
+  offsetX: string
+  offsetY: string
+}
+
 /** where the wrapper sits, the wrapper centers so the animated child never carries a translate */
-export function helpTextWrapperStyle(position: HelpTextPosition, config: HelpTextConfig): CSSProperties {
-  const style: CSSProperties = { maxWidth: config.maxWidth }
+export function helpTextWrapperStyle(position: HelpTextPosition, config: EdgeLayout, maxWidth?: string): CSSProperties {
+  const style: CSSProperties = { maxWidth }
 
   if (position.startsWith('top')) style.top = config.offsetY
   else if (position.startsWith('bottom')) style.bottom = config.offsetY

@@ -15,7 +15,7 @@ export default function HelpText() {
   const hidden = helpTextHiddenState(position)
 
   return (
-    <div className="fixed z-10" style={helpTextWrapperStyle(position, config)}>
+    <div className="fixed z-10" style={helpTextWrapperStyle(position, config, config.maxWidth)}>
       <AnimatePresence mode="wait">
         {entry !== null && data !== null && (
           <motion.div
