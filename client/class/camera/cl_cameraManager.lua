@@ -7,6 +7,30 @@ local utils = require "@REC_Library.client.cl_utils"
 local CameraManager = {}
 CameraManager.__index = CameraManager
 
+---[[
+---     Wait for the streamed scene
+---     The native stops reporting once the scene is in, a scene that never loads used
+---     to keep the setup polling forever. The scene is released either way, leaving it
+---     open pins the streamer around those coords.
+---]]
+---@param timeout? integer default 5000
+local function waitForLoadScene(timeout)
+
+    local deadline = GetGameTimer() + (timeout or 5000)
+
+    while IsNewLoadSceneLoaded() == false do
+
+        if GetGameTimer() > deadline then
+            utils:debugPrint("^3failed to load scene in time....^0")
+            break
+        end
+
+        Citizen.Wait(10)
+    end
+
+    NewLoadSceneStop()
+end
+
 ---instantiation
 ---@return self
 function CameraManager:new(config)
@@ -43,9 +67,7 @@ function CameraManager:setup()
             2
         )
 
-        while not IsNewLoadSceneLoaded() do
-            Citizen.Wait(10)
-        end
+        waitForLoadScene()
     end
 
     -- -- Texture loading
@@ -56,9 +78,7 @@ function CameraManager:setup()
         info.radius
     )
 
-    while not IsNewLoadSceneLoaded() do
-        Citizen.Wait(10)
-    end
+    waitForLoadScene()
 
     -- Fold the flag
     info.isSetuped = true

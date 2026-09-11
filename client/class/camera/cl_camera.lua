@@ -7,6 +7,29 @@ local utils = require "@REC_Library.client.cl_utils"
 local Camera = {}
 Camera.__index = Camera
 
+---[[
+---     Wait for the streamed scene
+---     A scene that never reports loaded used to keep this polling forever. The scene is
+---     released either way, leaving it open pins the streamer around those coords.
+---]]
+---@param timeout? integer default 5000
+local function waitForLoadScene(timeout)
+
+    local deadline = GetGameTimer() + (timeout or 5000)
+
+    while IsNewLoadSceneLoaded() == false do
+
+        if GetGameTimer() > deadline then
+            utils:debugPrint("^3failed to load scene in time....^0")
+            break
+        end
+
+        Citizen.Wait(10)
+    end
+
+    NewLoadSceneStop()
+end
+
 ---instantiation
 ---@param config REC_Library.Client.Class.Camera.CameraConfigBuilder
 ---@return self
@@ -76,9 +99,7 @@ function Camera:lookIn()
         2
     )
 
-    while not IsNewLoadSceneLoaded() do
-        Citizen.Wait(10)
-    end
+    waitForLoadScene()
 
 
     SetCamActive(info.handle, true)
