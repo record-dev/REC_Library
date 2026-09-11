@@ -63,7 +63,12 @@ function Particle:setup()
     return true
 end
 
----Instantaneous particle generation
+---[[
+---     Fire the particle
+---     A non looped particle is over the moment it fires, only a looped one keeps a
+---     handle and the isDrawing flag. With an entity set the particle is attached to
+---     it instead of being placed at the coords.
+---]]
 ---@return boolean Completed?
 function Particle:draw()
     local info = self.info
@@ -81,7 +86,7 @@ function Particle:draw()
     end
 
     -- Check if it is set up
-    if not HasNamedPtfxAssetLoaded(info.asset) then
+    if HasNamedPtfxAssetLoaded(info.asset) == false then
         utils:debugPrint("Particle asset not loaded: " .. info.asset)
         return false
     end
@@ -92,7 +97,35 @@ function Particle:draw()
     -- Explicitly declare assets to use
     UseParticleFxAssetNextCall(info.asset)
 
+    local alpha = info.colour.a / 255
+    local offset = info.customOffset
+
     if info.isLooped == false then
+
+        if info.entity ~= nil then
+
+            if StartParticleFxNonLoopedOnEntity(
+                info.name,
+                info.entity,
+                offset.x, offset.y, offset.z,
+                info.rotation.x, info.rotation.y, info.rotation.z,
+                info.scale,
+                false, -- false for now
+                false, -- false for now
+                false  -- false for now
+            ) == false then
+                utils:debugPrint(("^1failed to draw particle on entity... uid: %s^0"):format(info.uid))
+                info.isResolving = false
+                return false
+            end
+
+            SetParticleFxNonLoopedAlpha(alpha)
+
+            -- lower flag in progress
+            info.isResolving = false
+
+            return true
+        end
 
         info.handle = StartParticleFxNonLoopedAtCoord(
             info.name,
@@ -111,24 +144,25 @@ function Particle:draw()
             return false
         end
 
-        SetParticleFxNonLoopedAlpha(info.colour.a)
+        SetParticleFxNonLoopedAlpha(alpha)
 
-        if info.entity ~= nil then
-            if not StartNetworkedParticleFxNonLoopedOnEntity(
-                info.name,
-                info.entity,
-                info.customOffset.x, info.customOffset.y, info.customOffset.z,
-                info.rotation.x, info.rotation.y, info.rotation.z,
-                info.scale,
-                false, -- false for now
-                false, -- false for now
-                false  -- false for now
-            ) then
-                utils:debugPrint("Failed to start networked particle effect on entity: " .. tostring(entityHandle))
-                info.isResolving = false
-                return false
-            end
-        end
+        -- lower flag in progress
+        info.isResolving = false
+
+        return true
+    end
+
+    if info.entity ~= nil then
+        info.handle = StartParticleFxLoopedOnEntity(
+            info.name,
+            info.entity,
+            offset.x, offset.y, offset.z,
+            info.rotation.x, info.rotation.y, info.rotation.z,
+            info.scale,
+            false, -- false for now
+            false, -- false for now
+            false  -- false for now
+        )
     else
         info.handle = StartParticleFxLoopedAtCoord(
             info.name,
@@ -140,41 +174,24 @@ function Particle:draw()
             false, -- false for now
             false  -- unknown
         )
-
-        -- Existence confirmation
-        if info.handle == -1 then
-            utils:debugPrint(("^1failed to draw particle... uid: %s^0"):format(info.uid))
-            info.isResolving = false
-            return false
-        end
-
-        SetParticleFxLoopedColour(
-            info.handle,
-            info.colour.r/255,
-            info.colour.g/255,
-            info.colour.b/255,
-            true
-        )
-
-        SetParticleFxLoopedAlpha(info.handle, info.colour.a / 255)
-
-        if info.entity ~= nil then
-            if StartParticleFxNonLoopedOnEntity(
-                info.name,
-                info.entity,
-                info.customOffset.x, info.customOffset.y, info.customOffset.z,
-                info.rotation.x, info.rotation.y, info.rotation.z,
-                info.scale,
-                false, -- false for now
-                false, -- false for now
-                false  -- false for now
-            ) ~= true then
-                utils:debugPrint("Failed to start particle effect on entity: " .. tostring(info.entityHandle))
-                info.isResolving = false
-                return false
-            end
-        end
     end
+
+    -- Existence confirmation
+    if info.handle == -1 then
+        utils:debugPrint(("^1failed to draw particle... uid: %s^0"):format(info.uid))
+        info.isResolving = false
+        return false
+    end
+
+    SetParticleFxLoopedColour(
+        info.handle,
+        info.colour.r / 255,
+        info.colour.g / 255,
+        info.colour.b / 255,
+        true
+    )
+
+    SetParticleFxLoopedAlpha(info.handle, alpha)
 
     -- lower flag in progress
     info.isResolving = false
