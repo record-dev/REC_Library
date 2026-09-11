@@ -4,6 +4,16 @@
 ---     Every request waits until the asset is loaded, nil after timeout.
 ---]]
 
+---[[
+---     A Has* native answers with a boolean or with 1 / 0 depending on the native, so the
+---     answer is normalised before it is compared
+---]]
+---@param value any
+---@return boolean
+local function isLoaded(value)
+    return value == true or value == 1
+end
+
 ---@generic T
 ---@param request fun(asset: T)
 ---@param hasLoaded fun(asset: T): boolean
@@ -13,14 +23,14 @@
 ---@return T|nil
 local function streamingRequest(request, hasLoaded, assetType, asset, timeout)
 
-    if hasLoaded(asset) ~= false then
+    if isLoaded(hasLoaded(asset)) == true then
         return asset
     end
 
     request(asset)
 
     local deadline = GetGameTimer() + (timeout or 10000)
-    while hasLoaded(asset) == false do
+    while isLoaded(hasLoaded(asset)) == false do
 
         if GetGameTimer() > deadline then
             print(("^3failed to load %s '%s' in time...^0"):format(assetType, tostring(asset)))
@@ -94,7 +104,7 @@ function lib.requestScaleformMovie(scaleformName, timeout)
     local scaleform = RequestScaleformMovie(scaleformName)
 
     local deadline = GetGameTimer() + (timeout or 10000)
-    while HasScaleformMovieLoaded(scaleform) == false do
+    while isLoaded(HasScaleformMovieLoaded(scaleform)) == false do
 
         if GetGameTimer() > deadline then
             print(("^3failed to load scaleform '%s' in time...^0"):format(scaleformName))
