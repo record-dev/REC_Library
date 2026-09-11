@@ -158,14 +158,6 @@ local api = {
         ---@field SubtitleConfigBuilder REC_Library.Client.Class.UI.SubtitleConfigBuilder
         UI = {
 
-            -- ---@class REC_Library.Client.API.Class.UI.Managers
-            -- ---@field HelpTextManager REC_Library.Client.Class.UI.Managers.HelpTextManager
-            -- ---@field ScaleformManager ui.manager
-            -- Managers = {
-            --     HelpTextManager = require "@REC_Library.client.class.ui.managers.cl_helpTextManager",
-            --     ScaleformManager = require "@REC_Library.client.class.ui.managers.cl_scaleformManager",
-            -- },
-
             HelpText = require "@REC_Library.client.class.ui.cl_helpText",
             HelpTextConfigBuilder = require "@REC_Library.client.class.ui.cl_helpTextConfigBuilder",
             Scaleform = require "@REC_Library.client.class.ui.cl_scaleform",
