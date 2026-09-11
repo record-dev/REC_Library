@@ -182,16 +182,16 @@ function CameraManager:switchTo(camIndex, duration, inteval)
 
     -- Wait until switching is complete
     local totalDuration = duration + inteval
-    local currentTime = GetGameTimer()
-    local endTime = currentTime + totalDuration
-    while currentTime <= endTime do
-        Wait(5)
 
-        if targetCam.callbacks.onSwitching ~= nil then
+    if targetCam.callbacks.onSwitching == nil then
+        Wait(totalDuration)
+    else
+
+        local endTime = GetGameTimer() + totalDuration
+        while GetGameTimer() <= endTime do
+            Wait(5)
             targetCam.callbacks.onSwitching(self)
         end
-
-        currentTime = GetGameTimer()
     end
 
     -- Update current camera number
