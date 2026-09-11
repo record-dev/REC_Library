@@ -14,6 +14,7 @@
 ---@field textureDict string|nil
 ---@field textureName string|nil
 ---@field drawOnEnt boolean Draw below entity
+---@field drawDistance number the manager skips the draw beyond this distance
 local MarkerConfigBuilder = {}
 MarkerConfigBuilder.__index = MarkerConfigBuilder
 
@@ -38,6 +39,7 @@ function MarkerConfigBuilder:new(markerType)
     instance.textureDict = nil
     instance.textureName = nil
     instance.drawOnEnt = false
+    instance.drawDistance = 150.0
     return instance
 end
 
@@ -158,6 +160,20 @@ function MarkerConfigBuilder:setDrawOnEnt(draw)
     if draw == nil then return self end
     assert(type(draw) == "boolean", "DrawOnEnt must be a boolean.")
     self.drawOnEnt = draw return self
+end
+
+---[[
+---     Distance the marker is drawn within
+---     The managers measure it against the player and skip DrawMarker beyond it, so a
+---     marker on the other side of the map costs nothing. The default is far past the
+---     point a marker is still readable, lower it when many markers are registered.
+---]]
+---@param distance number|nil
+---@return self chain method
+function MarkerConfigBuilder:setDrawDistance(distance)
+    if distance == nil then return self end
+    assert(type(distance) == "number" and distance > 0, "DrawDistance must be a positive number.")
+    self.drawDistance = distance return self
 end
 
 ---Build and return in table format
