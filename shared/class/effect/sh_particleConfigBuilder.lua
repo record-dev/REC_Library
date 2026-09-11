@@ -36,7 +36,7 @@ function ParticleConfigBuilder:new(uid, coords, asset, name, scale)
     assert(uid ~= nil and type(uid) == "string")
     assert(asset ~= nil and type(asset) == "string")
     assert(name ~= nil and type(name) == "string")
-    assert(scale ~= nil and type(name) == "string")
+    assert(scale ~= nil and type(scale) == "number")
     local instance = setmetatable({}, self)
     instance.uid = uid
     instance.handle = -1
