@@ -19,12 +19,10 @@ description 'Ⓒ RE:CORD Library'
 
 shared_script {
     'init.lua',
-    'shared/class/**/*.lua',
     'shared/*.lua',
 }
 
 client_scripts {
-    'client/class/**/*.lua',
     'client/ui/cl_alert.lua',
     'client/ui/cl_input.lua',
     'client/ui/cl_context.lua',
@@ -38,19 +36,23 @@ client_scripts {
 }
 
 server_scripts {
-    'server/class/**/*.lua',
     'server/*.lua',
 }
 
 ui_page 'web/build/index.html'
 
 ---[[
----     init.lua and lib/ run inside the resources that load them, so every client
----     has to be able to download them.
+---     init.lua, lib/ and the classes run inside the resources that load them, so every
+---     client has to be able to download them. They are not scripts of this resource:
+---     sh_api / cl_api require them, and listing them here instead of in the script
+---     lists stops every class from being loaded a second time in this resource.
+---     server/class/ is left out on purpose, the server reads it straight from disk.
 ---]]
 files {
     'init.lua',
     'lib/**/*.lua',
+    'shared/class/**/*.lua',
+    'client/class/**/*.lua',
     'client/ui/cl_nui.lua',
     'locales/web/*.json',
     'web/build/index.html',
