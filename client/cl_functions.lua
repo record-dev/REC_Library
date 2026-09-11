@@ -39,24 +39,18 @@ function functions.requestOwnership(entity, timeout)
     return true
 end
 
+---[[
+---     The three request helpers below are the boolean flavour of lib.requestX, the
+---     polling lives in lib/streaming so there is only one of it.
+---]]
+
 ---Object, vehicle model request
 ---@class REC_Library.Client.Functions.RequestModel
 ---@param modelHash number
 ---@param timeout? number
 ---@return boolean Completed?
 function functions.requestModel(modelHash, timeout)
-    timeout = timeout or 2000 -- 2 seconds
-
-    RequestModel(modelHash)
-    while not HasModelLoaded(modelHash) do
-        timeout = timeout - 100
-        if timeout <= 0 then
-            utils:debugPrint("Model loading timed out for object with modelHash " .. (modelHash or "N/A"))
-            return false
-        end
-        Wait(100)
-    end
-    return true
+    return lib.requestModel(modelHash, timeout or 2000) ~= nil
 end
 
 ---Object, vehicle model request
@@ -65,18 +59,7 @@ end
 ---@param timeout? number
 ---@return boolean Completed?
 function functions.requestAnimDict(dict, timeout)
-    timeout = timeout or 2000 -- 2 seconds
-
-    RequestAnimDict(dict)
-    while not HasAnimDictLoaded(dict) do
-        timeout = timeout - 100
-        if timeout <= 0 then
-            utils:debugPrint("Dict loading timed out for object with dict " .. (dict or "N/A"))
-            return false
-        end
-        Wait(100)
-    end
-    return true
+    return lib.requestAnimDict(dict, timeout or 2000) ~= nil
 end
 
 ---Loading particles
@@ -85,18 +68,7 @@ end
 ---@param timeout? number Default is 2000 milliseconds (2 seconds)
 ---@return boolean Completed?
 function functions.requestNamedPtfxAsset(asset, timeout)
-    timeout = timeout or 2000 -- 2 seconds
-
-    RequestNamedPtfxAsset(asset)
-    while not HasNamedPtfxAssetLoaded(asset) do
-        timeout = timeout - 100
-        if timeout <= 0 then
-            utils:debugPrint("Ptfx asset loading timed out for asset " .. (asset or "N/A"))
-            return false
-        end
-        Wait(100)
-    end
-    return true
+    return lib.requestNamedPtfxAsset(asset, timeout or 2000) ~= nil
 end
 
 --[[
