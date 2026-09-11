@@ -1,11 +1,17 @@
 
+---@type REC_Library.Client.Utils
+local utils = require "@REC_Library.client.cl_utils"
+
 ---@type REC_Library.Client.Class._Core.TickManager
 local TickManager = require "@REC_Library.client.class._core.cl_tickManager"
 
 ---@class REC_Library.Client.Class.Marker.Managers.DynamicMarkerManager
+---@field boundItems table<integer, REC_Library.Client.Class.Marker.Managers.DynamicMarkerManager.BoundItem>
+---@field count integer
 local DynamicMarkerManager = {}
 DynamicMarkerManager.name = "DynamicMarkerManager"
-DynamicMarkerManager.boundItemsByResource = {}
+DynamicMarkerManager.boundItems = {}
+DynamicMarkerManager.count = 0
 DynamicMarkerManager.nextId = 1
 
 ---Connect drawable objects to entities and start managing them as dynamic markers
@@ -14,22 +20,21 @@ DynamicMarkerManager.nextId = 1
 ---@param offset? vector3 Offset from entity coordinates (optional)
 ---@return integer ID used for unbind
 function DynamicMarkerManager:bind(renderable, target, offset)
-    local ownerResource = GetCurrentResourceName()
-    if not self.boundItemsByResource[ownerResource] then
-        self.boundItemsByResource[ownerResource] = {}
-    end
 
-    local needsToRegister = not self:hasBoundItems()
     local id = self.nextId
-    self.boundItemsByResource[ownerResource][id] = {
+    self.nextId = id + 1
+
+    self.boundItems[id] = {
         renderable = renderable,
         target = target,
-        offset = offset or vector3(0.0, 0.0, 0.0)
+        offset = offset or vector3(0.0, 0.0, 0.0),
+        drawDistance = renderable.info ~= nil and renderable.info.drawDistance or 150.0,
     }
-    self.nextId = self.nextId + 1
+    self.count += 1
 
-    if needsToRegister then
-        TickManager:register(self.name, function() self:update() end)
+    -- the first binding opens the shared tick, the last one closes it again
+    if self.count == 1 then
+        TickManager:registerTick(self.name, function () self:update() end)
     end
 
     return id
@@ -38,48 +43,52 @@ end
 ---Untrack dynamic markers
 ---@param id integer ID returned by the bind function
 function DynamicMarkerManager:unbind(id)
-    local ownerResource = GetCurrentResourceName()
-    if self.boundItemsByResource[ownerResource] and self.boundItemsByResource[ownerResource][id] then
-        self.boundItemsByResource[ownerResource][id] = nil
+
+    if self.boundItems[id] == nil then
+        utils:debugPrint(("^3[DynamicMarkerManager:unbind] item is not founded... id: %s^0"):format(tostring(id)))
+        return
+    end
+
+    self.boundItems[id] = nil
+    self.count -= 1
+
+    if self.count <= 0 then
+        self.count = 0
+        TickManager:unregisterTick(self.name)
     end
 end
 
 ---Update process called every frame from TickManager
 function DynamicMarkerManager:update()
 
-    -- When there are no more management targets, unregister yourself from TickManager and stop the loop
-    if not self:hasBoundItems() then
-        TickManager:unregisterTick(self.name)
-        return
-    end
+    local coords = cache.coords
 
-    for resourceName, items in pairs(self.boundItemsByResource) do
-        for id, item in pairs(items) do
-            if DoesEntityExist(item.target) then
-                local entityPos = GetEntityCoords(item.target)
-                local drawPos = entityPos + item.offset
-                item.renderable:drawAt(drawPos)
-            else
-                items[id] = nil
-            end
+    for id, item in pairs(self.boundItems) do
+
+        if DoesEntityExist(item.target) == false then
+            self:unbind(id)
+            goto continue
         end
+
+        local drawPos = GetEntityCoords(item.target) + item.offset
+        if #(coords - drawPos) <= item.drawDistance then
+            item.renderable:drawAt(drawPos)
+        end
+
+        ::continue::
     end
 end
 
 ---Helper function to check whether the table to be drawn is empty
 ---@return boolean
 function DynamicMarkerManager:hasBoundItems()
-    for resourceName, items in pairs(self.boundItemsByResource) do
-        if next(items) then return true end
-    end
-    return false
+    return self.count > 0
 end
 
--- Detect that a resource has stopped, and if there is a resource name that has registered a drawing target, invalidate it
-AddEventHandler('onResourceStop', function(resourceName)
-    if DynamicMarkerManager.boundItemsByResource[resourceName] then
-        DynamicMarkerManager.boundItemsByResource[resourceName] = nil
-    end
-end)
-
 return DynamicMarkerManager
+
+---@class REC_Library.Client.Class.Marker.Managers.DynamicMarkerManager.BoundItem
+---@field renderable table
+---@field target integer
+---@field offset vector3
+---@field drawDistance number

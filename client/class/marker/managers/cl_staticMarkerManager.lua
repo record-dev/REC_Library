@@ -9,31 +9,28 @@ local TickManager = require "@REC_Library.client.class._core.cl_tickManager"
 local Marker = require "@REC_Library.client.class.marker.cl_marker"
 
 ---@class REC_Library.Client.Class.Marker.Managers.StaticMarkerManager
+---@field markers table<integer, REC_Library.Client.Class.Marker.Marker>
+---@field count integer
 local StaticMarkerManager = {}
 StaticMarkerManager.name = "StaticMarkerManager"
-StaticMarkerManager.staticMarkersByResource = {}
+StaticMarkerManager.markers = {}
+StaticMarkerManager.count = 0
 StaticMarkerManager.nextId = 1
 
----Create new static markers and manage them with resources
+---Create new static markers and manage them
 ---@param markerConfigBuilder REC_Library.Client.Class.Marker.MarkerConfigBuilder
 ---@return integer
 function StaticMarkerManager:create(markerConfigBuilder)
-    local ownerResource = GetCurrentResourceName()
-    if not self.staticMarkersByResource[ownerResource] then
-        self.staticMarkersByResource[ownerResource] = {}
-    end
-
-    local wasEmpty = not self:hasMarkers()
 
     local id = self.nextId
-    local markerInstance = Marker:new(markerConfigBuilder)
+    self.nextId = id + 1
 
-    -- Store markers in a table for each resource
-    self.staticMarkersByResource[ownerResource][id] = markerInstance
-    self.nextId = self.nextId + 1
+    self.markers[id] = Marker:new(markerConfigBuilder)
+    self.count += 1
 
-    if wasEmpty then
-        TickManager:registerTick(self.name, function() self:update() end)
+    -- the first marker opens the shared tick, the last one closes it again
+    if self.count == 1 then
+        TickManager:registerTick(self.name, function () self:update() end)
     end
 
     return id
@@ -42,22 +39,30 @@ end
 ---Remove static marker by ID
 ---@param id integer
 function StaticMarkerManager:remove(id)
-    -- Identify which resource the deletion request is from
-    local ownerResource = GetCurrentResourceName()
-    if self.staticMarkersByResource[ownerResource] and self.staticMarkersByResource[ownerResource][id] then
-        self.staticMarkersByResource[ownerResource][id] = nil
+
+    if self.markers[id] == nil then
+        utils:debugPrint(("^3[StaticMarkerManager:remove] marker is not founded... id: %s^0"):format(tostring(id)))
+        return
+    end
+
+    self.markers[id] = nil
+    self.count -= 1
+
+    if self.count <= 0 then
+        self.count = 0
+        TickManager:unregisterTick(self.name)
     end
 end
 
 ---Update process called every frame from TickManager
 function StaticMarkerManager:update()
-    if not self:hasMarkers() then
-        TickManager:unregisterTick(self.name)
-        return
-    end
 
-    for resourceName, markers in pairs(self.staticMarkersByResource) do
-        for id, marker in pairs(markers) do
+    local coords = cache.coords
+
+    for _, marker in pairs(self.markers) do
+
+        local info = marker.info
+        if #(coords - info.coords) <= (info.drawDistance or 150.0) then
             marker:draw()
         end
     end
@@ -66,20 +71,7 @@ end
 ---Helper function to check if there is at least one marker being managed
 ---@return boolean
 function StaticMarkerManager:hasMarkers()
-    for resourceName, markers in pairs(self.staticMarkersByResource) do
-        if next(markers) then
-            return true
-        end
-    end
-    return false
+    return self.count > 0
 end
-
--- This onResourceStop handler now works properly now that the data structure is correct
-AddEventHandler('onResourceStop', function(resourceName)
-    if StaticMarkerManager.staticMarkersByResource[resourceName] then
-        utils:debugPrint(('[%s] Resource "%s" stopped. Cleaning up static markers.'):format(StaticMarkerManager.name, resourceName))
-        StaticMarkerManager.staticMarkersByResource[resourceName] = nil
-    end
-end)
 
 return StaticMarkerManager
