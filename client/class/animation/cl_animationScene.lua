@@ -156,7 +156,11 @@ function AnimationScene:play(pedActor, objActor, propActors, goToObjActor, camer
         local scene = info.localScene
         local lastPhase = -1
 
-        while info.isRunning and not info.stopRequested do
+        -- a looped scene without a tick callback only waits for the stop request, it has
+        -- no phase to watch and does not need a frame of its own
+        local waitTime = (info.isLooped == true and info.tickCallback == nil) and 200 or 0
+
+        while info.isRunning == true and info.stopRequested == false do
             if info.isLooped == false then
                 local currentPhase = GetSynchronizedScenePhase(scene)
                 if currentPhase >= 0.988 then
@@ -178,7 +182,7 @@ function AnimationScene:play(pedActor, objActor, propActors, goToObjActor, camer
                 info.tickCallback(self)
             end
 
-            Wait(0)
+            Wait(waitTime)
         end
 
         -- Termination processing
