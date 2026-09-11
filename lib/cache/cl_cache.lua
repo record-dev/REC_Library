@@ -74,6 +74,12 @@ end
 ---@return integer | false
 local function getSeat(ped, vehicle)
 
+    -- the seat hardly ever changes, confirm the known one before scanning the vehicle
+    local known = cache.seat
+    if known ~= false and GetPedInVehicleSeat(vehicle, known) == ped then
+        return known
+    end
+
     for seat = -1, GetVehicleMaxNumberOfPassengers(vehicle) - 1 do
         if GetPedInVehicleSeat(vehicle, seat) == ped then
             return seat
