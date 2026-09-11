@@ -235,11 +235,13 @@ function Object:spawn(isInternalReplaceCall)
                 Wait(10)
                 interiorId = GetInteriorFromEntity(info.handle)
 
-                if timeout <= 0 then
-                    utils:debugPrint("^1waiting timeout^0")
-                end
+                timeout -= 10
 
-                timeout = timeout - 10
+                -- an object outside any interior never resolves one, stop polling
+                if timeout <= 0 then
+                    utils:debugPrint(("^3failed to get interior in time... uid: %s^0"):format(tostring(info.uid)))
+                    return
+                end
             end
 
             ForceRoomForEntity(info.handle, interiorId, info.roomKey)
