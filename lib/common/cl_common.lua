@@ -6,40 +6,65 @@
 ---[[
 ---     disableControls
 ---     lib.disableControls:Add(30, 31) once, then lib.disableControls() every frame.
+---     The call walks a flat array that Add / Remove rebuild, so the per frame cost is
+---     one native per held control and nothing else.
 ---]]
 ---@class REC_Library.Lib.DisableControls
+---@field controls table<integer, integer> how many holders asked for each control
+---@field active integer[] the controls with at least one holder
 ---@overload fun()
 lib.disableControls = setmetatable({
     controls = {},
+    active = {},
 }, {
     __call = function (self)
-        for control, count in pairs(self.controls) do
-            if count > 0 then
-                DisableControlAction(0, control, true)
-            end
+        local active = self.active
+        for i = 1, #active do
+            DisableControlAction(0, active[i], true)
         end
     end,
 })
 
+---@private
+function lib.disableControls:refresh()
+
+    local active = {}
+    for control, count in pairs(self.controls) do
+        if count > 0 then
+            active[#active+1] = control
+        end
+    end
+
+    self.active = active
+end
+
 ---@param ... integer
 function lib.disableControls:Add(...)
+
     for _, control in ipairs({ ... }) do
         self.controls[control] = (self.controls[control] or 0) + 1
     end
+
+    self:refresh()
 end
 
 ---@param ... integer
 function lib.disableControls:Remove(...)
+
     for _, control in ipairs({ ... }) do
         local count = self.controls[control]
         if count ~= nil then
-            self.controls[control] = math.max(0, count - 1)
+            -- drop the entry instead of keeping a zero, nothing has to walk it again
+            self.controls[control] = count > 1 and count - 1 or nil
         end
     end
+
+    self:refresh()
 end
 
 function lib.disableControls:Clear()
     self.controls = {}
+    self.active = {}
 end
 
 
