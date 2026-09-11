@@ -152,53 +152,73 @@ local function cleanup()
     progress = nil
 end
 
+---[[
+---     The controls the data asks to disable, flattened once, duplicates dropped
+---]]
 ---@param data REC_Library.Lib.Progress.Data
----@return boolean cancel
-local function shouldCancel(data)
+---@return integer[]
+local function disabledControls(data)
 
-    local ped = cache.ped
-
-    if data.useWhileDead ~= true and IsEntityDead(ped) ~= false then
-        return true
+    local disable = data.disable
+    if disable == nil then
+        return {}
     end
 
-    if data.allowRagdoll ~= true and IsPedRagdoll(ped) ~= false then
-        return true
+    local seen = {}
+    local active = {}
+
+    for key, list in pairs(controls) do
+        if disable[key] == true then
+            for _, control in ipairs(list) do
+                if seen[control] == nil then
+                    seen[control] = true
+                    active[#active+1] = control
+                end
+            end
+        end
     end
 
-    if data.allowCuffed ~= true and IsPedCuffed(ped) ~= false then
-        return true
-    end
+    return active
+end
 
-    if data.allowFalling ~= true and IsPedFalling(ped) ~= false then
-        return true
-    end
+---[[
+---     The ped state checks this progress cancels on, resolved once from the flags
+---]]
+---@param data REC_Library.Lib.Progress.Data
+---@return (fun(ped: integer): boolean)[]
+local function cancelChecks(data)
 
-    if data.allowSwimming ~= true and IsPedSwimming(ped) ~= false then
-        return true
-    end
+    local checks = {}
 
-    return false
+    if data.useWhileDead ~= true then checks[#checks+1] = IsEntityDead end
+    if data.allowRagdoll ~= true then checks[#checks+1] = IsPedRagdoll end
+    if data.allowCuffed ~= true then checks[#checks+1] = IsPedCuffed end
+    if data.allowFalling ~= true then checks[#checks+1] = IsPedFalling end
+    if data.allowSwimming ~= true then checks[#checks+1] = IsPedSwimming end
+
+    return checks
 end
 
 ---@param data REC_Library.Lib.Progress.Data
 local function watch(data)
 
+    -- resolved before the thread starts, the loop body only calls natives
+    local disabled, checks = disabledControls(data), cancelChecks(data)
+    local disabledCount, checkCount = #disabled, #checks
+
     CreateThread(function ()
         while progress == data do
 
-            if data.disable ~= nil then
-                for key, list in pairs(controls) do
-                    if data.disable[key] == true then
-                        for _, control in ipairs(list) do
-                            DisableControlAction(0, control, true)
-                        end
-                    end
-                end
+            for i = 1, disabledCount do
+                DisableControlAction(0, disabled[i], true)
             end
 
-            if shouldCancel(data) == true then
-                lib.cancelProgress()
+            local ped = cache.ped
+            for i = 1, checkCount do
+                if checks[i](ped) ~= false then
+                    lib.cancelProgress()
+                    break
+                end
             end
 
             Wait(0)
