@@ -47,13 +47,18 @@ function TrackSimulator:startMonitor(lastNodeIndex, speed)
         while info.hasRunningMonitor == true do
             Wait(info.waitTime)
 
-            while true do
-                Wait(0)
+            -- catch up on every node the train passed while we waited, a full lap is the
+            -- most that can be needed and bounds the loop without yielding the server
+            local guard = #info.trackNodes
+
+            while guard > 0 do
+                guard -= 1
+
                 local nextNodeIndex = info.currentNodeIndex + 1
 
-                -- If there is no next node, return to 0 and loop
+                -- If there is no next node, return to the first one and loop
                 if info.trackNodes[nextNodeIndex] == nil then
-                    nextNodeIndex = 0
+                    nextNodeIndex = 1
                 end
 
                 -- Calculate distance to destination
@@ -65,21 +70,28 @@ function TrackSimulator:startMonitor(lastNodeIndex, speed)
                 -- Elapsed time
                 local elapsedTime = (GetGameTimer() - info.timeAtNode) / 1000.0
 
-                if elapsedTime >= timeToNextNode then
-
-                    info.currentNodeIndex = nextNodeIndex
-
-                    info.timeAtNode = info.timeAtNode + (timeToNextNode * 1000)
-
-                    utils:debugPrint("列車がノード " .. nextNodeIndex .. " に到達しました。（追いつき処理）")
-                else
+                if elapsedTime < timeToNextNode then
                     break
+                end
+
+                info.currentNodeIndex = nextNodeIndex
+
+                info.timeAtNode = info.timeAtNode + (timeToNextNode * 1000)
+
+                utils:debugPrint("列車がノード " .. nextNodeIndex .. " に到達しました。（追いつき処理）")
+
+                if info.onCurrentTrackNodeIndexChanged ~= nil then
+                    info.onCurrentTrackNodeIndexChanged(self)
                 end
             end
         end
 
         -- info.currentNodeIndex = 
     end)
+
+    if info.onStartMonitor ~= nil then
+        info.onStartMonitor(self)
+    end
 
     return true
 end
@@ -106,6 +118,10 @@ function TrackSimulator:stopMonitor()
 
     --Disable monitoring
     info.hasRunningMonitor = false
+
+    if info.onStopMonitor ~= nil then
+        info.onStopMonitor(self)
+    end
 
     return true
 end
