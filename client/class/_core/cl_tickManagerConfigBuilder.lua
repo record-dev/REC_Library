@@ -36,7 +36,7 @@ end
 function TickManagerConfigBuilder:build()
     local finalOptions = {}
     for k, v in pairs(self) do
-        if v ~= nil and type(v) == "function" then
+        if v ~= nil and type(v) ~= "function" then
             finalOptions[k] = v
         end
     end
