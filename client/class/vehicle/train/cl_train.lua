@@ -140,6 +140,9 @@ function Train:spawn()
             return false
         end
         Wait(100)
+
+        -- the id has to be read again, waiting on a stale 0 only burns the timeout
+        info.netId = NetworkGetNetworkIdFromEntity(info.handle)
     end
 
     -- Also get the loading vehicle

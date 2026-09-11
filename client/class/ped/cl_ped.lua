@@ -29,22 +29,16 @@ function Ped:newFromNetId(netId)
 
     local timeout = 1200
     while DoesEntityExist(handle) == false do
-        utils:debugPrint("waiting exist")
-        handle = NetworkGetEntityFromNetworkId(netId)
 
         if timeout <= 0 then
-            utils:debugPrint("waiting timeout")
+            utils:debugPrint(("^3failed to resolve ped in time... netId: %d^0"):format(netId))
             return
         end
 
-        timeout = timeout - 50
+        timeout -= 100
         Wait(100)
-    end
 
-    -- Existence confirmation
-    if DoesEntityExist(handle) == false then
-        utils:debugPrint("[Ped:newFromHandle] ped is not founded with handle:", handle)
-        return
+        handle = NetworkGetEntityFromNetworkId(netId)
     end
 
     ---@type REC_Library.Shared.Class.Ped.PedConfigBuilder
