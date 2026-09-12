@@ -57,7 +57,7 @@ const SAMPLES: { label: string; run: () => void }[] = [
     label: 'menu',
     run: () => send('showMenu', {
       id: 'sample-menu', token: 1, title: 'RE:CORD', subtitle: 'Menu preview', position: 'top-right',
-      color: '#00ff88', width: 380, visibleItems: 8, canClose: true, canBack: false,
+      color: '#5b9bea', width: 380, visibleItems: 8, canClose: true, canBack: false,
       selected: 'action', items: [
         { id: 'action', type: 'button', label: 'Action', icon: 'play', description: 'Use arrows to navigate, Enter to select, Esc to go back.' },
         { id: 'check', type: 'checkbox', label: 'Enabled', value: false },
