@@ -622,6 +622,22 @@ function WebAuth:toSession(tokenInfo, areas)
 end
 
 ---[[
+---     The client IP behind req.address, port stripped and normalized
+---     Meant for audit rows, so a caller does not re-implement the parsing.
+---]]
+---@param address any
+---@return string|nil
+function WebAuth:clientIp(address)
+
+    local ip = parseAddress(address)
+    if ip == nil then
+        return nil
+    end
+
+    return normalizeIp(ip)
+end
+
+---[[
 ---     Whether a browser request comes from an allowed address
 ---]]
 ---@param address any
