@@ -11,6 +11,9 @@ local MenuItemConfigBuilder = require "@REC_Library.client.class.ui.cl_menuItemC
 ---@type REC_Library.Client.Utils
 local utils = require "@REC_Library.client.cl_utils"
 
+---@type REC_Library.Shared.Config
+local shCfg = require "@REC_Library.shared.sh_config"
+
 ---@class REC_Library.Client.UI.Menu.Entry
 ---@field config REC_Library.Client.Class.UI.MenuConfigBuilder
 ---@field selected? string
@@ -24,6 +27,13 @@ local active = nil
 local history = {}
 local sequence = 0
 local controlsRunning = false
+
+---@param key REC_Library.Shared.Config.MenuSound
+local function playSound(key)
+    local sound = shCfg.ui.menu.sounds[key]
+    if sound == false or sound == nil then return end
+    PlaySoundFrontend(-1, sound.name, sound.set, true)
+end
 
 local function startControls()
     if controlsRunning == true then return end
@@ -94,7 +104,7 @@ local function send()
     end
     nui:send("showMenu", {
         id = config.id, token = active.token, title = config.title, subtitle = config.subtitle,
-        position = config.position or "top-left", color = config.color or "#5b9bea", banner = config.banner,
+        position = config.position or "top-left", color = config.color or shCfg.ui.menu.color, banner = config.banner,
         width = config.width or 380, visibleItems = config.visibleItems or 8, canClose = config.canClose ~= false,
         canBack = #history > 0, selected = entry.selected, items = items,
     })
@@ -153,6 +163,7 @@ function lib.showMenu(id)
     -- An onClose callback can open a different menu.
     if active ~= nil or menus[resource] == nil or menus[resource][id] ~= entry then return false end
     show(resource, entry)
+    playSound("open")
     return true
 end
 
@@ -251,6 +262,7 @@ RegisterNUICallback("menuAction", function (data, cb)
     if data.action == "back" then
         if #history > 0 then
             local parent = table.remove(history)
+            playSound("back")
             invoke(config.onBack)
             if active ~= current then return end
             if menus[current.owner] == nil or menus[current.owner][parent.config.id] ~= parent then
@@ -259,12 +271,16 @@ RegisterNUICallback("menuAction", function (data, cb)
             end
             show(current.owner, parent)
         elseif config.canClose ~= false then
+            playSound("close")
             close("exit")
         end
         return
     end
     if data.action == "close" then
-        if config.canClose ~= false then close("exit") end
+        if config.canClose ~= false then
+            playSound("close")
+            close("exit")
+        end
         return
     end
 
@@ -277,14 +293,18 @@ RegisterNUICallback("menuAction", function (data, cb)
     if data.action == "hover" then
         local previous = entry.selected
         entry.selected = item.id
-        if previous ~= item.id then invoke(config.onSwitch, item.id, previous) end
+        if previous ~= item.id then
+            playSound("navigate")
+            invoke(config.onSwitch, item.id, previous)
+        end
         return
     end
     if data.action ~= "select" and data.action ~= "change" then return end
+    if data.action == "change" and data.direction ~= 1 and data.direction ~= -1 then return end
     entry.selected = item.id
+    playSound(data.action)
 
     if data.action == "change" or (data.action == "select" and item.type == "checkbox") then
-        if data.action == "change" and data.direction ~= 1 and data.direction ~= -1 then return end
         local oldValue = item.value
         item.value = nextValue(item, data.direction or 1)
         send()

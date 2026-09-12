@@ -9,6 +9,12 @@ function nui:isOnlyFocus() return self.focused == true and self.blocked == false
 function nui:onReady(handler) readyHandler = handler end
 modules["@REC_Library.client.ui.cl_nui"] = nui
 modules["@REC_Library.client.cl_utils"] = { debugPrint = function () end, }
+local sounds = {}
+modules["@REC_Library.shared.sh_config"] = { ui = { menu = {
+    color = "#8feb61", keepInput = true,
+    sounds = { open = { name = "open", set = "test", }, navigate = { name = "navigate", set = "test", }, change = { name = "change", set = "test", }, select = { name = "select", set = "test", }, back = { name = "back", set = "test", }, close = false, },
+}, }, }
+function PlaySoundFrontend(_, name) sounds[#sounds+1] = name end
 
 function require(name)
     if modules[name] ~= nil then return modules[name] end
@@ -88,13 +94,15 @@ lib.registerMenu(config)
 lib.registerMenu(child)
 check(lib.showMenu("missing") == false, "unknown menu")
 check(lib.showMenu("main") == true and nui.focused == true, "open owns focus")
+check(snapshot().color == "#8feb61" and sounds[#sounds] == "open", "config colour and open sound")
 check(snapshot().items[1].onChange == nil and snapshot().items[1].args == nil, "callbacks stay in Lua")
 action("select", "check")
 check(changes == 1 and lastValue == true, "checkbox invokes exported callable ref")
+check(sounds[#sounds] == "select", "select sound")
 action("select", "check")
 check(lib.getMenuValue("main", "check") == false, "checkbox toggles back to false")
 action("change", "slider", -1)
-check(lastValue == true, "slider wraps backwards")
+check(lastValue == true and sounds[#sounds] == "change", "slider wraps backwards")
 action("change", "slider", 1)
 check(lib.getMenuValue("main", "slider") == false, "slider wraps to false value")
 action("change", "range", 1)
@@ -113,10 +121,13 @@ action("select", "label")
 action("select", "unknown")
 check(changes == previous and selections == 1, "invalid actions rejected")
 action("hover", "slider")
-check(switches == 1, "selection callback")
+check(switches == 1 and sounds[#sounds] == "navigate", "selection callback")
+local played = #sounds
+action("hover", "slider")
+action("change", "range", 100)
 action("back")
 action("close")
-check(lib.getOpenMenu() == "main", "canClose blocks user exit")
+check(lib.getOpenMenu() == "main" and #sounds == played, "canClose blocks user exit, rejected actions stay silent")
 local oldToken = snapshot().token
 check(lib.updateMenuItem("main", "check", { disabled = true, }) == true, "live item update")
 action("select", "check", nil, oldToken)
@@ -126,7 +137,7 @@ check(lib.getOpenMenu() == "child" and snapshot().canBack == true, "submenu open
 action("select", "cycle")
 check(lib.getOpenMenu() == "child", "submenu cycles rejected")
 action("back")
-check(lib.getOpenMenu() == "main" and snapshot().selected == "child", "parent selection restored")
+check(lib.getOpenMenu() == "main" and snapshot().selected == "child" and sounds[#sounds] == "back", "parent selection restored")
 nui.blocked = true
 action("change", "slider", 1)
 check(lib.getMenuValue("main", "slider") == false, "other focus owner pauses input")
