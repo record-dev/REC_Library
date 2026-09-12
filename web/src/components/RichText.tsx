@@ -78,9 +78,11 @@ interface Props {
   keyColor?: string
   /** keycap look, each skin brings its own */
   keyClassName: string
+  /** Menu player IDs such as [2] are text, while [E] remains a keycap. */
+  literalNumericBrackets?: boolean
 }
 
-export function RichText({ text, keyColor, keyClassName }: Props) {
+export function RichText({ text, keyColor, keyClassName, literalNumericBrackets = false }: Props) {
   const keyStyle: CSSProperties = {
     color: keyColor,
     borderColor: keyColor,
@@ -92,6 +94,7 @@ export function RichText({ text, keyColor, keyClassName }: Props) {
         return <br key={index} />
 
       case 'key':
+        if (literalNumericBrackets && /^\d+$/.test(segment.key)) return <span key={index}>[{segment.key}]</span>
         return (
           <kbd key={index} className={keyClassName} style={keyStyle}>
             {segment.key}

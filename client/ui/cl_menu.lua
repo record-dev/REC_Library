@@ -114,7 +114,7 @@ local function send()
     nui:send("showMenu", {
         id = config.id, token = active.token, title = config.title, subtitle = config.subtitle,
         position = config.position or "top-left", color = config.color or shCfg.ui.menu.color, banner = config.banner,
-        width = config.width or 380, visibleItems = config.visibleItems or 8, canClose = config.canClose ~= false,
+        width = config.width or 340, visibleItems = config.visibleItems or 8, canClose = config.canClose ~= false,
         canBack = #history > 0, selected = entry.selected, items = items,
     })
 end
