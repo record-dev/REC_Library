@@ -519,7 +519,7 @@ local function createMenuSample()
             :setDisabled(true))
         :addItem(ui.MenuItemConfigBuilder:new("result", strings.MENU_SAMPLE_LAST_RESULT, "label")
             :setValue(strings.MENU_SAMPLE_WAITING))
-        :addItem(ui.MenuItemConfigBuilder:new("close", strings.CLOSE)
+        :addItem(ui.MenuItemConfigBuilder:new("close", strings.MENU_CLOSE)
             :setIcon("xmark")
             :setCloseOnSelect(true))
 
