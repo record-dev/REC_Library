@@ -40,11 +40,20 @@ local function startControls()
     controlsRunning = true
     CreateThread(function ()
         local controls = { [188] = "ArrowUp", [187] = "ArrowDown", [189] = "ArrowLeft", [190] = "ArrowRight", [201] = "Enter", [202] = "Escape", }
+        -- pause menu, phone / frontend cancel, attack and melee: the keys and clicks the game would otherwise see while keepInput is on
+        local blocked = { 24, 25, 140, 141, 142, 177, 194, 199, 200, 257, 263, 264, }
         while active ~= nil do
-            if nui:isOnlyFocus("menu") == true and IsInputDisabled(2) == false then
+            if nui:isOnlyFocus("menu") == true then
+                if shCfg.ui.menu.keepInput == true then
+                    for _, control in ipairs(blocked) do
+                        DisableControlAction(0, control, true)
+                    end
+                end
+                -- keyboard keys reach the page directly, only the gamepad needs relaying
+                local gamepad = IsInputDisabled(2) == false
                 for control, key in pairs(controls) do
                     DisableControlAction(2, control, true)
-                    if IsDisabledControlJustPressed(2, control) ~= false then
+                    if gamepad == true and IsDisabledControlJustPressed(2, control) ~= false then
                         nui:send("menuControl", { key = key, })
                     end
                 end

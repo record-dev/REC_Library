@@ -64,7 +64,7 @@ export function useMenu() {
       }
     } else if (pressed === 'ArrowLeft' || pressed === 'ArrowRight') {
       action('change', current.selected, pressed === 'ArrowLeft' ? -1 : 1)
-    } else if (pressed === 'Enter' || pressed === ' ') {
+    } else if (pressed === 'Enter') {
       action('select', current.selected)
     } else if (pressed === 'Escape' || pressed === 'Backspace') {
       action('back')
@@ -78,7 +78,7 @@ export function useMenu() {
   useEffect(() => {
     if (menu === null || enabled === false) return
     const listener = (event: KeyboardEvent) => {
-      if (event.repeat && ['Enter', ' ', 'Escape', 'Backspace'].includes(event.key)) {
+      if (event.repeat && ['Enter', 'Escape', 'Backspace'].includes(event.key)) {
         event.preventDefault()
         event.stopImmediatePropagation()
         return
