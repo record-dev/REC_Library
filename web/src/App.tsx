@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import DevPanel from './components/DevPanel'
+import Menu from './components/Menu'
 import { setStrings, type Strings } from './i18n'
 import { copyText, fetchNui, inFiveM, useNuiEvent } from './nui'
 import { applyTheme, initialTheme, normalizeTheme, type ThemeState } from './theme'
@@ -36,16 +37,19 @@ export default function App() {
   const Skin = THEMES[theme.name]
 
   return (
-    <div key={`${theme.name}-${localeVersion}`} className={`dark text-foreground ${theme.name === 'ox' ? 'ox-root' : ''}`}>
-      <Skin.TextUI />
-      <Skin.HelpText />
-      <Skin.Subtitle />
-      <Skin.Gauge />
-      <Skin.ProgressBar />
-      <Skin.ContextMenu />
-      <Skin.AlertDialog />
-      <Skin.InputDialog />
-      {mockEnabled && <DevPanel />}
-    </div>
+    <>
+      <Menu />
+      <div key={`${theme.name}-${localeVersion}`} className={`dark text-foreground ${theme.name === 'ox' ? 'ox-root' : ''}`}>
+        <Skin.TextUI />
+        <Skin.HelpText />
+        <Skin.Subtitle />
+        <Skin.Gauge />
+        <Skin.ProgressBar />
+        <Skin.ContextMenu />
+        <Skin.AlertDialog />
+        <Skin.InputDialog />
+        {mockEnabled && <DevPanel />}
+      </div>
+    </>
   )
 }

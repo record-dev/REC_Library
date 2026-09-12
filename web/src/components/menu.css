@@ -1,0 +1,62 @@
+.rec-menu {
+  position: fixed;
+  z-index: 30;
+  top: 4vh;
+  left: 3vw;
+  width: min(var(--menu-width), 94vw);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  font-family: Arial, 'Noto Sans JP', sans-serif;
+  font-size: clamp(12px, 1.6vh, 18px);
+  outline: none;
+  filter: drop-shadow(0 8px 18px rgb(0 0 0 / 0.25));
+}
+.rec-menu[data-enabled='false'] { pointer-events: none; }
+.rec-menu[data-position='top-center'], .rec-menu[data-position='bottom-center'], .rec-menu[data-position='center'] { left: 50%; transform: translateX(-50%); }
+.rec-menu[data-position='top-right'], .rec-menu[data-position='right-center'], .rec-menu[data-position='bottom-right'] { left: auto; right: 3vw; }
+.rec-menu[data-position='left-center'], .rec-menu[data-position='right-center'] { top: 50%; transform: translateY(-50%); }
+.rec-menu[data-position='center'] { top: 50%; transform: translate(-50%, -50%); }
+.rec-menu[data-position^='bottom-'] { top: auto; bottom: 4vh; }
+.rec-menu-banner {
+  flex: none;
+  min-height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(125deg, #09293a, #14394d 55%, #081521);
+  background-size: cover;
+  background-position: center;
+}
+.rec-menu-banner h1 { font-size: 2.5em; font-weight: 800; font-style: italic; line-height: 1.1; text-align: center; overflow-wrap: anywhere; text-shadow: 0 2px 4px #000; }
+.rec-menu-subtitle { flex: none; display: flex; justify-content: space-between; gap: 12px; padding: 10px 14px; background: var(--menu-color); color: var(--menu-contrast); font-weight: 700; }
+.rec-menu-subtitle > :first-child { min-width: 0; overflow-wrap: anywhere; }
+.rec-menu-subtitle > :last-child { flex: none; }
+.rec-menu-items { min-height: 0; overflow-y: auto; max-height: calc(var(--menu-visible) * 44px); background: rgb(0 0 0 / 0.82); }
+.rec-menu-row { display: flex; min-height: 44px; align-items: stretch; border-bottom: 1px solid rgb(255 255 255 / 0.08); }
+.rec-menu-row[data-selected='true'] { background: var(--menu-color); color: var(--menu-contrast); }
+.rec-menu-row[data-disabled='true'] { opacity: 0.4; }
+.rec-menu-label { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; padding: 10px 14px; text-align: left; }
+.rec-menu-label > i { flex: none; width: 20px; text-align: center; }
+.rec-menu-label > span:first-of-type { overflow-wrap: anywhere; min-width: 0; }
+.rec-menu-value { margin-left: auto; display: flex; align-items: center; justify-content: flex-end; max-width: 100%; overflow-wrap: anywhere; }
+.rec-menu-adjust { display: flex; align-items: center; flex: none; max-width: 58%; gap: 5px; padding-right: 8px; }
+.rec-menu-adjust > button { flex: none; font-size: 1.5em; padding: 4px 6px; }
+.rec-menu button:focus-visible { outline: 2px solid currentColor; outline-offset: -3px; }
+.rec-menu-confirm { display: flex; gap: 3px; font-size: 0.8em; }
+.rec-menu-confirm > span { padding: 3px 5px; border: 1px solid currentColor; }
+.rec-menu-confirm > [data-active='true'] { background: #fff; color: #111; }
+.rec-menu-row[data-selected='true'] .rec-menu-confirm > [data-active='true'] { background: var(--menu-contrast); color: var(--menu-color); }
+.rec-menu-range { display: flex; align-items: center; gap: 8px; font-variant-numeric: tabular-nums; }
+.rec-menu-track { width: clamp(30px, 5vw, 70px); height: 5px; background: rgb(255 255 255 / 0.25); }
+.rec-menu-track > span { display: block; height: 100%; background: currentColor; }
+.rec-menu-description { flex-shrink: 2; overflow-y: auto; padding: 12px 14px; margin-top: 5px; border-left: 4px solid var(--menu-color); background: rgb(0 0 0 / 0.86); overflow-wrap: anywhere; }
+.rec-menu-footer { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; background: rgb(0 0 0 / 0.9); font-size: 0.75em; }
+.rec-menu-footer kbd, .rec-menu-key { padding: 1px 3px; border: 1px solid currentColor; border-radius: 2px; }
+.rec-menu-empty { padding: 18px; color: #aaa; }
+@media (max-height: 480px) {
+  .rec-menu-banner { min-height: 56px; padding: 10px; }
+  .rec-menu-banner h1 { font-size: 1.8em; }
+}

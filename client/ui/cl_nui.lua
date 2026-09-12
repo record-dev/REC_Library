@@ -40,12 +40,23 @@ function nui:focus(owner, toggle)
 
     local hasFocus = next(focusOwners) ~= nil
     SetNuiFocus(hasFocus, hasFocus)
+    self:send("setMenuInputEnabled", self:isOnlyFocus("menu"))
 end
 
 ---@param owner string
 ---@return boolean
 function nui:hasFocus(owner)
     return focusOwners[owner] == true
+end
+
+---@param owner string
+---@return boolean
+function nui:isOnlyFocus(owner)
+    if focusOwners[owner] ~= true then return false end
+    for key in pairs(focusOwners) do
+        if key ~= owner then return false end
+    end
+    return true
 end
 
 ---@return boolean

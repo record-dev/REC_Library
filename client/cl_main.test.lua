@@ -419,3 +419,125 @@ lib.addCommand("rl-gaugehide", {
     local isOpen, ids = lib.isGaugeOpen()
     utils:debugPrint(("^2gauges hidden... isOpen: %s, remaining: %d^0"):format(tostring(isOpen), #ids))
 end)
+
+
+
+---[[
+---     Menu builder sample
+---]]
+---@type REC_Library.Client.Class.UI.Menu|nil, REC_Library.Client.Class.UI.Menu|nil
+local sampleMenu, sampleDetailsMenu = nil, nil
+
+---@return table<string, string>
+local function menuSampleStrings()
+    local strings = json.decode(LoadResourceFile(GetCurrentResourceName(), "locales/web/en.json"))
+    local raw = LoadResourceFile(GetCurrentResourceName(), ("locales/web/%s.json"):format(shApi.Config.language))
+    if raw ~= nil then
+        for key, value in pairs(json.decode(raw)) do
+            strings[key] = value
+        end
+    end
+    return strings
+end
+
+local function createMenuSample()
+    local ui = clApi.Class.UI
+    local strings = menuSampleStrings()
+
+    ---@param id string
+    ---@param value? REC_Library.Lib.Menu.Value
+    local function report(id, value)
+        local displayValue = tostring(value)
+        if type(value) == "boolean" then
+            displayValue = value == true and strings.MENU_YES or strings.MENU_NO
+        end
+        local result = (strings.MENU_SAMPLE_RESULT):format(id, displayValue)
+        sampleMenu:updateItem("result", { value = result, })
+        lib.showSubtitle({ text = result, name = strings.MENU_SAMPLE_TITLE, duration = 3000, })
+        utils:debugPrint(("^2menu sample... %s = %s^0"):format(id, tostring(value)))
+    end
+
+    local detailsConfig = ui.MenuConfigBuilder:new("rl-menu-sample-details", strings.MENU_SAMPLE_DETAILS)
+        :setSubtitle(strings.MENU_SAMPLE_BACK_HINT)
+        :setPosition("top-right")
+        :addItem(ui.MenuItemConfigBuilder:new("enable", strings.MENU_SAMPLE_ENABLE)
+            :setIcon("lightbulb")
+            :setDescription(strings.MENU_SAMPLE_UPDATE_HINT)
+            :setOnSelect(function ()
+                sampleMenu:setValue("checkbox", true)
+                report("checkbox", sampleMenu:getValue("checkbox"))
+            end))
+        :addItem(ui.MenuItemConfigBuilder:new("child-action", strings.MENU_SAMPLE_BUTTON)
+            :setOnSelect(function ()
+                report("child-action", strings.MENU_SAMPLE_SELECTED)
+            end))
+
+    sampleDetailsMenu = ui.Menu:new(detailsConfig)
+    sampleDetailsMenu:register()
+
+    local menuConfig = ui.MenuConfigBuilder:new("rl-menu-sample", strings.MENU_SAMPLE_TITLE)
+        :setSubtitle(strings.MENU_SAMPLE_HINT)
+        :setPosition("top-right")
+        :setColor("#00ff88")
+        :setVisibleItems(6)
+        :addItem(ui.MenuItemConfigBuilder:new("button", strings.MENU_SAMPLE_BUTTON)
+            :setIcon("play")
+            :setDescription(strings.MENU_SAMPLE_BUTTON_HINT)
+            :setOnSelect(function ()
+                report("button", strings.MENU_SAMPLE_SELECTED)
+            end))
+        :addItem(ui.MenuItemConfigBuilder:new("checkbox", strings.MENU_SAMPLE_CHECKBOX, "checkbox")
+            :setValue(false)
+            :setOnChange(function (value)
+                report("checkbox", value)
+            end))
+        :addItem(ui.MenuItemConfigBuilder:new("slider", strings.MENU_SAMPLE_SLIDER, "slider")
+            :setValues({
+                { label = strings.MENU_SAMPLE_NORMAL, value = "normal", },
+                { label = strings.MENU_SAMPLE_SPORT, value = "sport", },
+            })
+            :setValue("normal")
+            :setOnChange(function (value)
+                report("slider", value)
+            end))
+        :addItem(ui.MenuItemConfigBuilder:new("range", strings.MENU_SAMPLE_RANGE, "range")
+            :setRange(0, 100, 5)
+            :setValue(50)
+            :setOnChange(function (value)
+                report("range", value)
+            end))
+        :addItem(ui.MenuItemConfigBuilder:new("confirm", strings.MENU_SAMPLE_CONFIRM, "confirm")
+            :setDescription(strings.MENU_SAMPLE_CONFIRM_HINT)
+            :setValue(false)
+            :setOnSelect(function (value)
+                report("confirm", value)
+            end))
+        :addItem(ui.MenuItemConfigBuilder:new("details", strings.MENU_SAMPLE_DETAILS, "submenu")
+            :setIcon("folder-open")
+            :setMenu("rl-menu-sample-details"))
+        :addItem(ui.MenuItemConfigBuilder:new("disabled", strings.MENU_SAMPLE_DISABLED)
+            :setDisabled(true))
+        :addItem(ui.MenuItemConfigBuilder:new("result", strings.MENU_SAMPLE_LAST_RESULT, "label")
+            :setValue(strings.MENU_SAMPLE_WAITING))
+        :addItem(ui.MenuItemConfigBuilder:new("close", strings.CLOSE)
+            :setIcon("xmark")
+            :setCloseOnSelect(true))
+
+    sampleMenu = ui.Menu:new(menuConfig)
+end
+
+lib.addCommand("rl-menu", {
+    help = "Open the builder-based menu sample (debug)",
+}, function ()
+    if sampleMenu == nil then createMenuSample() end
+    sampleMenu:open()
+end)
+
+lib.addCommand("rl-menuclose", {
+    help = "Close the menu sample, including its submenu (debug)",
+}, function ()
+    local id = lib.getOpenMenu()
+    if id == "rl-menu-sample" or id == "rl-menu-sample-details" then
+        lib.hideMenu()
+    end
+end)

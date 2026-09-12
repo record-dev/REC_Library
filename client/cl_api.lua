@@ -156,7 +156,14 @@ local api = {
         ---@field ScaleformConfigBuilder REC_Library.Client.Class.UI.ScaleformConfigBuilder
         ---@field Subtitle REC_Library.Client.Class.UI.Subtitle
         ---@field SubtitleConfigBuilder REC_Library.Client.Class.UI.SubtitleConfigBuilder
+        ---@field Menu REC_Library.Client.Class.UI.Menu
+        ---@field MenuConfigBuilder REC_Library.Client.Class.UI.MenuConfigBuilder
+        ---@field MenuItemConfigBuilder REC_Library.Client.Class.UI.MenuItemConfigBuilder
         UI = {
+
+            Menu = require "@REC_Library.client.class.ui.cl_menu",
+            MenuConfigBuilder = require "@REC_Library.client.class.ui.cl_menuConfigBuilder",
+            MenuItemConfigBuilder = require "@REC_Library.client.class.ui.cl_menuItemConfigBuilder",
 
             -- ---@class REC_Library.Client.API.Class.UI.Managers
             -- ---@field HelpTextManager REC_Library.Client.Class.UI.Managers.HelpTextManager
