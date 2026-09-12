@@ -186,10 +186,17 @@ export interface GaugeConfig {
   animationDuration: number
 }
 
+/** built by cl_nui.lua from config.ui.menu */
+export interface MenuConfig {
+  offsetX: string
+  offsetY: string
+}
+
 export interface HudConfig {
   helpText: HelpTextConfig
   subtitle: SubtitleConfig
   gauge: GaugeConfig
+  menu: MenuConfig
 }
 
 export type MenuValue = string | number | boolean
