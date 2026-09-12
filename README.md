@@ -3,7 +3,7 @@
 https://docs.re-cord.dev/en/common-dependencies/rec_library
 ## Menu UI
 
-A MenuV-style menu is available alongside context menus and dialogs. It has a banner, subtitle, selected-row description, scrolling, and button, checkbox, choice slider, numeric range, confirmation, submenu, and label rows. Keyboard arrows navigate/change values, Enter selects, and Escape/Backspace returns to the parent or closes the root. Mouse controls and gamepad D-pad/A/B are also supported.
+A MenuV-style menu is available alongside context menus and dialogs. It has a banner, subtitle, selected-row description, scrolling, and button, checkbox, choice slider, numeric range, confirmation, submenu, and label rows. Keyboard arrows navigate/change values, Enter selects, and Escape/Backspace returns to the parent or closes the root. Gamepad D-pad/A/B are also supported. Each action plays the MenuV frontend sound, and the player keeps control of the ped while a menu is open; mouse controls are available when `config.ui.menu.keepInput` is `false`.
 
 The implementation uses REC_Library's existing React NUI. MenuV's Lua menu/item objects, event handling, NUI serialization, and selection logic were studied in the local `menuv/source/` files. No MenuV runtime dependency, Vue bundle, fonts, or texture assets are needed. This is a new REC_Library API; existing `MenuV:CreateMenu` calls must be adapted.
 
@@ -75,7 +75,11 @@ Pass the builder directly to `Menu:new`. IDs are scoped to the calling resource.
 | MenuItemConfigBuilder | `setType`, `setLabel`, `setDescription`, `setIcon`, `setValue`, `setValues`, `setRange(min, max, step)`, `setMenu`, `setDisabled`, `setCloseOnSelect`, `setArgs` |
 | MenuItemConfigBuilder events | `setOnSelect(fn(value, args, id))`, `setOnChange(fn(value, oldValue, args, id))` |
 
-Setters return the builder. Optional setters ignore `nil`; supplied values are validated. `build()` returns a validated copy if a plain table is needed. `color` is `#RRGGBB`, `width` is 240–800 pixels (default 380), and `visibleItems` is 1–20 (default 8). `banner` is an optional image URL, including a caller-provided NUI asset URL. Nine positions are supported: `top-left`, `top-center`, `top-right`, `left-center`, `center`, `right-center`, `bottom-left`, `bottom-center`, `bottom-right`.
+Setters return the builder. Optional setters ignore `nil`; supplied values are validated. `build()` returns a validated copy if a plain table is needed. `color` is `#RRGGBB`, `width` is 240–800 pixels (default 340), and `visibleItems` is 1–20 (default 8). `banner` is an optional image URL, including a caller-provided NUI asset URL. Nine positions are supported: `top-left`, `top-center`, `top-right`, `left-center`, `center`, `right-center`, `bottom-left`, `bottom-center`, `bottom-right`.
+
+`config.ui.menu` in `shared/sh_config.lua` holds the server-wide look and feel: `offset` moves the top positions below the REC_Notify stack (default `2vw` / `12vh`), `color` is the accent used when a builder omits `setColor` (default `#8feb61`, painted on the subtitle bar, the selected row, and the sliders with black or white text chosen by luminance), `keepInput` keeps the game input while a menu is open (default `true`, no cursor, keyboard and gamepad only; `false` shows the cursor and blocks the game like a dialog), and `sounds` maps `open`, `navigate`, `change`, `select`, `back`, and `close` to a GTA frontend sound (`false` for silence). The banner uses the RE:CORD patterned texture and bold uppercase title unless `setBanner` provides an image. Menu rows use a compact 31px height with an icon divider; `setIcon` accepts emoji as well as Font Awesome names.
+
+The green menu heading displays `subtitle` when supplied, otherwise the current menu's `title`. Empty or whitespace-only subtitles also fall back to `title`, so menus without `setSubtitle` still show their name when opened or entered as a submenu.
 
 Checkbox selection toggles its boolean and runs change/select callbacks. Choice sliders wrap through distinct string/number/boolean values. Numeric ranges clamp at the bounds and use the configured step. Confirmation rows choose Yes/No with Left/Right and submit that boolean on Enter; the caller decides what each answer does. A label is display-only. Buttons stay open unless `setCloseOnSelect(true)` is used.
 
