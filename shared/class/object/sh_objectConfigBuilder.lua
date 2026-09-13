@@ -141,6 +141,7 @@ function ObjectConfigBuilder:setSpawnTimeout(spawnTimeout)
     if spawnTimeout == nil then return self end
     assert(type(spawnTimeout) == "number", "")
     self.spawnTimeout = spawnTimeout
+    return self
 end
 
 ---@param destroyTimeout integer|nil
