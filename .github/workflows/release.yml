@@ -94,7 +94,7 @@ jobs:
 
           # ZIP圧縮 (ファイル名をリポジトリ名にする)
           cd "$DIST_DIR"
-          zip -r "../${TARGET_NAME}.zip" "$TARGET_NAME"
+          zip -r "../${TARGET_NAME}.zip" "$TARGET_NAME" -x '*/.gitignore'
 
       - name: Update CHANGELOG
         id: changelog
