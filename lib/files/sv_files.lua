@@ -4,7 +4,7 @@
 ---]]
 
 ---@type boolean
-local isWindows = package.config:sub(1, 1) == "\\"
+local isWindows = GetConvar("version", ""):find("win32", 1, true) ~= nil
 
 ---[[
 ---     File names inside <resource>/<path> whose name matches pattern
