@@ -1,3 +1,3 @@
 
 ## Documentation
-https://docs.re-cord.dev/en/common-dependencies/rec_library
+https://docs.re-cord.dev/en/common-dependencies/rec_library/introducation
