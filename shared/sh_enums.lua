@@ -93,6 +93,7 @@ enums.VehiclefuelTypes = {
 
 ---@enum REC_Library.Shared.Enums.Dispatch
 enums.DispatchTypes = {
+    rec = "rec",
     lb = "lb-tablet",
     ps = "ps-dispatch",
     custom = "custom",

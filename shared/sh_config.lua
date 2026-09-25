@@ -13,12 +13,12 @@
 ---[[
 ---      This function is used to determine the configuration value based on the state of various resources.
 ---]]
----@param resourceChecks { resource: string, value: any }[]
+---@param resourceChecks { resource: string, value: any, installed?: boolean }[] installed = true also takes a resource that is present but not started yet
 ---@return any
 local function getConfigValue(resourceChecks)
     for _, check in ipairs(resourceChecks) do
         local status, result = pcall(GetResourceState, check.resource)
-        if status and result == 'started' then
+        if status and (result == 'started' or (check.installed == true and result ~= 'missing' and result ~= 'unknown')) then
             return check.value
         elseif not status then
             print(('^6[REC_Library] Error calling GetResourceState for resource "%s": %s^0'):format(check.resource, tostring(result)))
@@ -330,6 +330,7 @@ config.vehiclekeys = getConfigValue({
 ---]]
 ---@type REC_Library.Shared.Enums.Dispatch
 config.dispatch = getConfigValue({
+    { resource = "REC_Dispatch", value = "rec", installed = true }, -- the adapter checks the state on every call
     { resource = "lb-tablet", value = "lb-tablet" },
     { resource = "ps-dispatch", value = "ps-dispatch" },
 })
