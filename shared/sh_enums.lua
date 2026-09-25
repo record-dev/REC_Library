@@ -124,6 +124,7 @@ enums.NotifyTypes = {
 
 ---@enum REC_Library.Shared.Enums.Clothing
 enums.ClothingTypes = {
+    rec = "rec",
     illenium = "illenium",
     rcore = "rcore",
     custom = "custom",
