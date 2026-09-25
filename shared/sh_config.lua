@@ -350,7 +350,7 @@ config.notify = getConfigValue({
 ---]]
 ---@type REC_Library.Shared.Enums.Clothing
 config.clothing = getConfigValue({
-    { resource = "REC_Clothing", value = "rec", installed = true }, -- first, REC_Clothing provides illenium-appearance
+    { resource = "REC_Clothing", value = "rec", installed = true }, -- first, REC_Clothing wins when both are installed
     { resource = "illenium-appearance", value = "illenium" },
     { resource = "rcore_clothing", value = "rcore" },
 })
