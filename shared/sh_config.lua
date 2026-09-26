@@ -27,6 +27,8 @@ local function getConfigValue(resourceChecks)
     return "custom"
 end
 
+---@alias REC_Library.Shared.Config.MenuSound "open" | "navigate" | "change" | "select" | "back" | "close"
+
 ---@class REC_Library.Shared.Config
 local config = {}
 
@@ -235,6 +237,50 @@ config.ui = {
         ---]]
         ---@type integer
         animationDuration = 200, -- ms
+    },
+
+    ---[[
+    ---     List menu (lib.registerMenu / lib.showMenu), the NUI version of a MenuV menu
+    ---]]
+    menu = {
+
+        ---[[
+        ---     Distance from the screen edge (CSS units)
+        ---     y applies to the top-* positions and keeps the banner below the REC_Notify stack
+        ---]]
+        offset = {
+            ---@type string
+            x = "2vw",
+            ---@type string
+            y = "12vh",
+        },
+
+        ---[[
+        ---     Accent colour when the caller omits color (subtitle bar, selected row, sliders)
+        ---]]
+        ---@type string
+        color = "#8feb61",
+
+        ---[[
+        ---     Keep the player in control while a menu is open (walk, drive, look around)
+        ---     the mouse cursor stays hidden, so the menu is driven by keyboard and gamepad like MenuV
+        ---     false takes the input away from the game and shows the cursor like a dialog does
+        ---]]
+        ---@type boolean
+        keepInput = true,
+
+        ---[[
+        ---     Frontend sound for each menu action, false for silence
+        ---]]
+        ---@type table<REC_Library.Shared.Config.MenuSound, { name: string, set: string }|false>
+        sounds = {
+            open     = { name = "SELECT", set = "HUD_FRONTEND_DEFAULT_SOUNDSET", },
+            navigate = { name = "NAV_UP_DOWN", set = "HUD_FREEMODE_SOUNDSET", },
+            change   = { name = "NAV_LEFT_RIGHT", set = "HUD_FRONTEND_DEFAULT_SOUNDSET", },
+            select   = { name = "SELECT", set = "HUD_FRONTEND_DEFAULT_SOUNDSET", },
+            back     = { name = "BACK", set = "HUD_FRONTEND_DEFAULT_SOUNDSET", },
+            close    = { name = "BACK", set = "HUD_FRONTEND_DEFAULT_SOUNDSET", },
+        },
     },
 }
 

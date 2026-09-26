@@ -186,8 +186,48 @@ export interface GaugeConfig {
   animationDuration: number
 }
 
+/** built by cl_nui.lua from config.ui.menu */
+export interface MenuConfig {
+  offsetX: string
+  offsetY: string
+}
+
 export interface HudConfig {
   helpText: HelpTextConfig
   subtitle: SubtitleConfig
   gauge: GaugeConfig
+  menu: MenuConfig
+}
+
+export type MenuValue = string | number | boolean
+export type MenuPosition = HelpTextPosition | 'center'
+
+export interface MenuItem {
+  id: string
+  type: 'button' | 'checkbox' | 'slider' | 'range' | 'confirm' | 'submenu' | 'label'
+  label: string
+  description?: string
+  icon?: string
+  disabled?: boolean
+  value?: MenuValue
+  values?: { label: string; value: MenuValue; description?: string }[]
+  min?: number
+  max?: number
+  step?: number
+}
+
+export interface MenuData {
+  id: string
+  token: number
+  title: string
+  subtitle?: string
+  position: MenuPosition
+  color: string
+  banner?: string
+  width: number
+  visibleItems: number
+  canClose: boolean
+  canBack: boolean
+  selected?: string
+  items: MenuItem[]
 }

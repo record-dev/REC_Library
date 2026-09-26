@@ -31,6 +31,7 @@ end
 
 ---[[
 ---     Focus stays on while any owner holds it
+---     a menu on its own leaves the game input alone (no cursor), a dialog on top takes it back
 ---]]
 ---@param owner string
 ---@param toggle boolean
@@ -39,13 +40,28 @@ function nui:focus(owner, toggle)
     focusOwners[owner] = toggle == true and true or nil
 
     local hasFocus = next(focusOwners) ~= nil
-    SetNuiFocus(hasFocus, hasFocus)
+    local menuOnly = self:isOnlyFocus("menu")
+    local keepInput = hasFocus == true and menuOnly == true and shCfg.ui.menu.keepInput == true
+
+    SetNuiFocus(hasFocus, hasFocus == true and keepInput == false)
+    SetNuiFocusKeepInput(keepInput)
+    self:send("setMenuInputEnabled", menuOnly)
 end
 
 ---@param owner string
 ---@return boolean
 function nui:hasFocus(owner)
     return focusOwners[owner] == true
+end
+
+---@param owner string
+---@return boolean
+function nui:isOnlyFocus(owner)
+    if focusOwners[owner] ~= true then return false end
+    for key in pairs(focusOwners) do
+        if key ~= owner then return false end
+    end
+    return true
 end
 
 ---@return boolean
@@ -99,7 +115,7 @@ exports("getTheme", lib.getTheme)
 ---@return table
 local function uiConfig()
 
-    local helpTextCfg, subtitleCfg, gaugeCfg = shCfg.ui.helpText, shCfg.ui.subtitle, shCfg.ui.gauge
+    local helpTextCfg, subtitleCfg, gaugeCfg, menuCfg = shCfg.ui.helpText, shCfg.ui.subtitle, shCfg.ui.gauge, shCfg.ui.menu
 
     return {
         helpText = {
@@ -124,6 +140,10 @@ local function uiConfig()
             width             = gaugeCfg.width,
             fontScale         = gaugeCfg.fontScale,
             animationDuration = gaugeCfg.animationDuration,
+        },
+        menu = {
+            offsetX           = menuCfg.offset.x,
+            offsetY           = menuCfg.offset.y,
         },
     }
 end

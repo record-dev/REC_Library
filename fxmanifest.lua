@@ -28,6 +28,7 @@ client_scripts {
     'client/ui/cl_alert.lua',
     'client/ui/cl_input.lua',
     'client/ui/cl_context.lua',
+    'client/ui/cl_menu.lua',
     'client/ui/cl_progress.lua',
     'client/ui/cl_textUI.lua',
     'client/ui/cl_text.lua',

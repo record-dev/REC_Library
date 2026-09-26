@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNuiEvent } from '../nui'
-import { HELP_TEXT_POSITIONS, type GaugeConfig, type HelpTextConfig, type HudConfig, type SubtitleConfig } from '../types'
+import { HELP_TEXT_POSITIONS, type GaugeConfig, type HelpTextConfig, type HudConfig, type MenuConfig, type SubtitleConfig } from '../types'
 
 // Defaults mirror config.ui in shared/sh_config.lua, so the overlays look right during the
 // few frames before setUiConfig arrives (and in the browser playground).
@@ -30,10 +30,16 @@ export const DEFAULT_GAUGE_CONFIG: GaugeConfig = {
   animationDuration: 200,
 }
 
+export const DEFAULT_MENU_CONFIG: MenuConfig = {
+  offsetX: '2vw',
+  offsetY: '12vh',
+}
+
 export const DEFAULT_HUD_CONFIG: HudConfig = {
   helpText: DEFAULT_HELP_TEXT_CONFIG,
   subtitle: DEFAULT_SUBTITLE_CONFIG,
   gauge: DEFAULT_GAUGE_CONFIG,
+  menu: DEFAULT_MENU_CONFIG,
 }
 
 /** a number that survives a missing or unusable value from Lua */
@@ -56,6 +62,7 @@ export function toHudConfig(raw: unknown): HudConfig {
   const helpText = { ...DEFAULT_HELP_TEXT_CONFIG, ...toObject<HelpTextConfig>(incoming.helpText) }
   const subtitle = { ...DEFAULT_SUBTITLE_CONFIG, ...toObject<SubtitleConfig>(incoming.subtitle) }
   const gauge = { ...DEFAULT_GAUGE_CONFIG, ...toObject<GaugeConfig>(incoming.gauge) }
+  const menu = { ...DEFAULT_MENU_CONFIG, ...toObject<MenuConfig>(incoming.menu) }
 
   return {
     helpText: {
@@ -75,6 +82,7 @@ export function toHudConfig(raw: unknown): HudConfig {
       fontScale: toNumber(gauge.fontScale, DEFAULT_GAUGE_CONFIG.fontScale, 0.1),
       animationDuration: toNumber(gauge.animationDuration, DEFAULT_GAUGE_CONFIG.animationDuration, 0),
     },
+    menu,
   }
 }
 
