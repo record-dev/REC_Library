@@ -24,19 +24,19 @@ QBTargetConfigBuilder.__index = QBTargetConfigBuilder
 
 ---instantiation
 ---@param name string name
----@param type REC_Library.Shared.Enums.TargetType.QB client|server
+---@param targetType REC_Library.Shared.Enums.TargetType.QB client|server
 ---@param label string Interaction label
 ---@return self
-function QBTargetConfigBuilder:new(name, type, label)
+function QBTargetConfigBuilder:new(name, targetType, label)
     assert(type(name) == "string")
-    assert(type(type) == "string" and (type == "client" or type == "server"))
+    assert(type(targetType) == "string" and (targetType == "client" or targetType == "server"))
     assert(type(label) == "string")
 
     local instance = setmetatable({}, self)
 
     -- Required
     instance.name = name
-    instance.type = type
+    instance.type = targetType
     instance.label = label
 
     --optional
