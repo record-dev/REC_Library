@@ -357,6 +357,7 @@ config.door = getConfigValue({
 config.vehiclefuel = getConfigValue({
     { resource = "ox_fuel", value = "ox" },
     { resource = "qb-fuel", value = "qb" },
+    { resource = "LegacyFuel", value = "qb" },
     { resource = "lc_fuel", value = "lc" },
     { resource = "cdn-fuel", value = "cdn" },
 })
