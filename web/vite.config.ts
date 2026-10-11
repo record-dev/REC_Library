@@ -2,7 +2,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
 // NUI only: ui_page 'web/build/index.html' loaded over the nui:// scheme.
-// Fixed file names keep the fxmanifest glob valid across rebuilds.
+// Hashed file names keep FiveM CEF from serving a stale cached chunk after a rebuild.
 export default defineConfig({
   base: './',
   plugins: [react()],
@@ -10,13 +10,6 @@ export default defineConfig({
     outDir: 'build',
     emptyOutDir: true,
     sourcemap: false,
-    rollupOptions: {
-      output: {
-        entryFileNames: 'assets/[name].js',
-        chunkFileNames: 'assets/[name].js',
-        assetFileNames: 'assets/[name].[ext]',
-      },
-    },
   },
   server: {
     port: 5173,
