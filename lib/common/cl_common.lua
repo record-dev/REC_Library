@@ -94,11 +94,17 @@ lib.raycast = {}
 ---@return integer materialHash
 local function resolveShapeTest(handle)
 
-    local _, hit, endCoords, surfaceNormal, materialHash, entityHit = GetShapeTestResultIncludingMaterial(handle)
+    local status, hit, endCoords, surfaceNormal, materialHash, entityHit = GetShapeTestResultIncludingMaterial(handle)
 
-    return hit ~= false and hit ~= 0, entityHit, endCoords, surfaceNormal, materialHash
+    -- status 2 means the test has finished
+    if status ~= 2 then
+        return false, 0, vector3(0.0, 0.0, 0.0), vector3(0.0, 0.0, 0.0), 0
+    end
+
+    return hit == 1 or hit == true, entityHit, endCoords, surfaceNormal, materialHash
 end
 
+---Synchronous (expensive) probe, so the result is returned immediately in the same frame
 ---@param coords vector3
 ---@param destination vector3
 ---@param flags? integer default 511
@@ -110,7 +116,7 @@ end
 ---@return integer materialHash
 function lib.raycast.fromCoords(coords, destination, flags, ignore)
 
-    local handle = StartShapeTestLosProbe(
+    local handle = StartExpensiveSynchronousShapeTestLosProbe(
         coords.x, coords.y, coords.z,
         destination.x, destination.y, destination.z,
         flags or 511, cache.ped, ignore or 4
@@ -119,6 +125,7 @@ function lib.raycast.fromCoords(coords, destination, flags, ignore)
     return resolveShapeTest(handle)
 end
 
+---Synchronous (expensive) probe, so the result is returned immediately in the same frame
 ---@param flags? integer default 511
 ---@param ignore? integer default 4
 ---@param distance? number default 10.0
