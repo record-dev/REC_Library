@@ -10,21 +10,25 @@
 ---]]
 
 
+---@class REC_Library.Shared.Config.Detected
+---@field value any adopted value, "custom" when nothing was found
+---@field resource string|nil name of the resource that matched, nil when nothing was found
+
 ---[[
 ---      This function is used to determine the configuration value based on the state of various resources.
 ---]]
 ---@param resourceChecks { resource: string, value: any, installed?: boolean }[] installed = true also takes a resource that is present but not started yet
----@return any
-local function getConfigValue(resourceChecks)
+---@return REC_Library.Shared.Config.Detected
+local function detectConfigValue(resourceChecks)
     for _, check in ipairs(resourceChecks) do
         local status, result = pcall(GetResourceState, check.resource)
         if status and (result == 'started' or (check.installed == true and result ~= 'missing' and result ~= 'unknown')) then
-            return check.value
+            return { value = check.value, resource = check.resource, }
         elseif not status then
             print(('^6[REC_Library] Error calling GetResourceState for resource "%s": %s^0'):format(check.resource, tostring(result)))
         end
     end
-    return "custom"
+    return { value = "custom", resource = nil, }
 end
 
 ---@alias REC_Library.Shared.Config.MenuSound "open" | "navigate" | "change" | "select" | "back" | "close"
@@ -285,132 +289,147 @@ config.ui = {
 }
 
 ---[[
----      Detect Framework
+---      Checks per category, the first resource that is running wins
 ---]]
+local detectChecks = {
+    framework = {
+        { resource = "ox_core", value = "ox" },
+        { resource = "qbx_core", value = "qbx" },
+        { resource = "es_extended", value = "esx" },
+        { resource = "qb-core", value = "qb" },
+        -- last on purpose: REC_Core stays dormant next to another core, so that core wins
+        { resource = "REC_Core", value = "rec" },
+    },
+    inventory = {
+        { resource = "ox_inventory", value = "ox" },
+        { resource = "qb-inventory", value = "qb" },
+    },
+    bank = {
+        { resource = "REC_Bank", value = "rec" },
+        { resource = "okokBanking", value = "okok" },
+        { resource = "tgg-banking", value = "tgg" },
+        { resource = "Renewed-Banking", value = "renewed" },
+        { resource = "qb-banking", value = "qb" },
+        { resource = "esx_society", value = "esx" },
+    },
+    medical = {
+        { resource = "REC_Medical", value = "rec" },
+        { resource = "qb-ambulancejob", value = "qb" },
+        { resource = "qbx_medical", value = "qbx" },
+        { resource = "wasabi_ambulance", value = "wsb_v1" },
+        { resource = "wasabi_ambulance_v2", value = "wsb_v2" },
+    },
+    target = {
+        { resource = "ox_target", value = "ox" },
+        { resource = "qb-target", value = "qb" },
+    },
+    door = {
+        { resource = "qb-doorlock", value = "qb" },
+        { resource = "ox_doorlock", value = "ox" },
+    },
+    vehiclefuel = {
+        { resource = "ox_fuel", value = "ox" },
+        { resource = "qb-fuel", value = "qb" },
+        { resource = "LegacyFuel", value = "qb" },
+        { resource = "lc_fuel", value = "lc" },
+        { resource = "cdn-fuel", value = "cdn" },
+    },
+    vehiclekeys = {
+        { resource = "qb-vehiclekeys", value = "qb" },
+        { resource = "qbx_vehiclekeys", value = "qbx" },
+        { resource = "wasabi_carlock", value = "wsb" },
+    },
+    dispatch = {
+        { resource = "REC_Dispatch", value = "rec", installed = true }, -- the adapter checks the state on every call
+        { resource = "lb-tablet", value = "lb-tablet" },
+        { resource = "ps-dispatch", value = "ps-dispatch" },
+    },
+    notify = {
+        { resource = "REC_Notify", value = "rec" },
+        { resource = "okokNotify", value = "okok" },
+        { resource = "ox_lib", value = "ox" },
+    },
+    clothing = {
+        { resource = "REC_Clothing", value = "rec", installed = true }, -- first, REC_Clothing wins when both are installed
+        { resource = "illenium-appearance", value = "illenium" },
+        { resource = "rcore_clothing", value = "rcore" },
+    },
+    garage = {
+        { resource = "REC_Garage", value = "rec" },
+        { resource = "qbx_garages", value = "qbx" },
+        { resource = "qb-garages", value = "qb" },
+    },
+}
+
+---@type string[]
+local categories = {
+    "framework",
+    "inventory",
+    "bank",
+    "medical",
+    "target",
+    "door",
+    "vehiclefuel",
+    "vehiclekeys",
+    "dispatch",
+    "notify",
+    "clothing",
+    "garage",
+}
+
+---[[
+---      Category names in display order, read-only
+---]]
+config.detectCategories = categories
+
+---[[
+---      Detect every category again and return the result per category
+---      The values on config are fixed when this file is loaded, call this later to see resources that started after that
+---]]
+---@return table<string, REC_Library.Shared.Config.Detected>
+function config.detect()
+    local result = {}
+    for _, category in ipairs(categories) do
+        result[category] = detectConfigValue(detectChecks[category])
+    end
+    return result
+end
+
 ---@type REC_Library.Shared.Enums.Framework
-config.framework = getConfigValue({
-    { resource = "ox_core", value = "ox" },
-    { resource = "qbx_core", value = "qbx" },
-    { resource = "es_extended", value = "esx" },
-    { resource = "qb-core", value = "qb" },
-    -- last on purpose: REC_Core stays dormant next to another core, so that core wins
-    { resource = "REC_Core", value = "rec" },
-})
+config.framework = detectConfigValue(detectChecks.framework).value
 
-
----[[
----      Detect Inventory
----]]
 ---@type REC_Library.Shared.Enums.Inventory
-config.inventory = getConfigValue({
-    { resource = "ox_inventory", value = "ox" },
-    { resource = "qb-inventory", value = "qb" },
-})
+config.inventory = detectConfigValue(detectChecks.inventory).value
 
----[[
----      Detect Bank
----]]
 ---@type REC_Library.Shared.Enums.Bank
-config.bank = getConfigValue({
-    { resource = "REC_Bank", value = "rec" },
-    { resource = "okokBanking", value = "okok" },
-    { resource = "tgg-banking", value = "tgg" },
-    { resource = "Renewed-Banking", value = "renewed" },
-    { resource = "qb-banking", value = "qb" },
-    { resource = "esx_society", value = "esx" },
-})
+config.bank = detectConfigValue(detectChecks.bank).value
 
----[[
----      Detect Medicals
----]]
 ---@type REC_Library.Shared.Enums.Medicals
-config.medical = getConfigValue({
-    { resource = "REC_Medical", value = "rec" },
-    { resource = "qb-ambulancejob", value = "qb" },
-    { resource = "qbx_medical", value = "qbx" },
-    { resource = "wasabi_ambulance", value = "wsb_v1" },
-    { resource = "wasabi_ambulance_v2", value = "wsb_v2" },
-})
+config.medical = detectConfigValue(detectChecks.medical).value
 
----[[
----      Detect Target
----]]
 ---@type REC_Library.Shared.Enums.Target
-config.target = getConfigValue({
-    { resource = "ox_target", value = "ox" },
-    { resource = "qb-target", value = "qb" },
-})
+config.target = detectConfigValue(detectChecks.target).value
 
----[[
----      Detect Doors
----]]
 ---@type REC_Library.Shared.Enums.Doors
-config.door = getConfigValue({
-    { resource = "qb-doorlock", value = "qb" },
-    { resource = "ox_doorlock", value = "ox" },
-})
+config.door = detectConfigValue(detectChecks.door).value
 
----[[
----      Detect Vehicleyfuel
----]]
 ---@type REC_Library.Shared.Enums.Vehiclefuel
-config.vehiclefuel = getConfigValue({
-    { resource = "ox_fuel", value = "ox" },
-    { resource = "qb-fuel", value = "qb" },
-    { resource = "LegacyFuel", value = "qb" },
-    { resource = "lc_fuel", value = "lc" },
-    { resource = "cdn-fuel", value = "cdn" },
-})
+config.vehiclefuel = detectConfigValue(detectChecks.vehiclefuel).value
 
----[[
----      Detect Vehiclekeys
----]]
 ---@type REC_Library.Shared.Enums.Vehiclekeys
-config.vehiclekeys = getConfigValue({
-    { resource = "qb-vehiclekeys", value = "qb" },
-    { resource = "qbx_vehiclekeys", value = "qbx" },
-    { resource = "wasabi_carlock", value = "wsb" },
-})
+config.vehiclekeys = detectConfigValue(detectChecks.vehiclekeys).value
 
----[[
----      Detect Dispatch
----]]
 ---@type REC_Library.Shared.Enums.Dispatch
-config.dispatch = getConfigValue({
-    { resource = "REC_Dispatch", value = "rec", installed = true }, -- the adapter checks the state on every call
-    { resource = "lb-tablet", value = "lb-tablet" },
-    { resource = "ps-dispatch", value = "ps-dispatch" },
-})
+config.dispatch = detectConfigValue(detectChecks.dispatch).value
 
----[[
----      Detect Notify
----]]
 ---@type REC_Library.Shared.Enums.Notify
-config.notify = getConfigValue({
-    { resource = "REC_Notify", value = "rec" },
-    { resource = "okokNotify", value = "okok" },
-    { resource = "ox_lib", value = "ox" },
-})
+config.notify = detectConfigValue(detectChecks.notify).value
 
----[[
----      Detect Clothing
----]]
 ---@type REC_Library.Shared.Enums.Clothing
-config.clothing = getConfigValue({
-    { resource = "REC_Clothing", value = "rec", installed = true }, -- first, REC_Clothing wins when both are installed
-    { resource = "illenium-appearance", value = "illenium" },
-    { resource = "rcore_clothing", value = "rcore" },
-})
+config.clothing = detectConfigValue(detectChecks.clothing).value
 
----[[
----      Detect Garage
----]]
 ---@type REC_Library.Shared.Enums.Garage
-config.garage = getConfigValue({
-    { resource = "REC_Garage", value = "rec" },
-    { resource = "qbx_garages", value = "qbx" },
-    { resource = "qb-garages", value = "qb" },
-})
+config.garage = detectConfigValue(detectChecks.garage).value
 
 
 ---[[
