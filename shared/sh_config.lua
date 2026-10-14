@@ -84,7 +84,7 @@ config.ui = {
             ---@type string
             x = "1.6vw",
             ---@type string
-            y = "3vh",
+            y = "9vh",
         },
 
         ---[[
@@ -335,8 +335,8 @@ local detectChecks = {
         { resource = "cdn-fuel", value = "cdn" },
     },
     vehiclekeys = {
-        { resource = "qb-vehiclekeys", value = "qb" },
         { resource = "qbx_vehiclekeys", value = "qbx" },
+        { resource = "qb-vehiclekeys", value = "qb" },
         { resource = "wasabi_carlock", value = "wsb" },
     },
     dispatch = {
