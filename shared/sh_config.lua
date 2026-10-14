@@ -316,8 +316,8 @@ local detectChecks = {
         { resource = "REC_Medical", value = "rec" },
         { resource = "qb-ambulancejob", value = "qb" },
         { resource = "qbx_medical", value = "qbx" },
-        { resource = "wasabi_ambulance", value = "wsb_v1" },
         { resource = "wasabi_ambulance_v2", value = "wsb_v2" },
+        { resource = "wasabi_ambulance", value = "wsb_v1" },
     },
     target = {
         { resource = "ox_target", value = "ox" },
