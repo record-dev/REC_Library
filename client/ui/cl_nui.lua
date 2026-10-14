@@ -156,9 +156,20 @@ RegisterNUICallback("ready", function (_, cb)
     nui:send("setLocale", loadStrings(shCfg.language) or loadStrings("en"))
     nui:send("setUiConfig", uiConfig())
 
-    for _, handler in ipairs(readyHandlers) do
-        handler()
-    end
+    ---[[
+    ---     setTheme / setLocale make web/ remount the whole overlay tree (its root keys the
+    ---     tree by theme and locale), which resets the ui config state and drops messages
+    ---     that land before the remounted tree has attached its listeners, so the config and
+    ---     the overlay states go out again once the remount has settled
+    ---]]
+    SetTimeout(500, function ()
+
+        nui:send("setUiConfig", uiConfig())
+
+        for _, handler in ipairs(readyHandlers) do
+            handler()
+        end
+    end)
 end)
 
 
