@@ -138,6 +138,12 @@ enums.GarageTypes = {
     custom = "custom",
 }
 
+---@enum REC_Library.Shared.Enums.NameTag
+enums.NameTagTypes = {
+    rec = "rec",
+    custom = "custom",
+}
+
 enums.TargetType = {}
 
 ---@enum REC_Library.Shared.Enums.TargetType.QB

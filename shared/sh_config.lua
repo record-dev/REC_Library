@@ -359,6 +359,9 @@ local detectChecks = {
         { resource = "qbx_garages", value = "qbx" },
         { resource = "qb-garages", value = "qb" },
     },
+    nametag = {
+        { resource = "REC_NameTag", value = "rec" },
+    },
 }
 
 ---@type string[]
@@ -375,6 +378,7 @@ local categories = {
     "notify",
     "clothing",
     "garage",
+    "nametag",
 }
 
 ---[[
@@ -430,6 +434,9 @@ config.clothing = detectConfigValue(detectChecks.clothing).value
 
 ---@type REC_Library.Shared.Enums.Garage
 config.garage = detectConfigValue(detectChecks.garage).value
+
+---@type REC_Library.Shared.Enums.NameTag
+config.nametag = detectConfigValue(detectChecks.nametag).value
 
 
 ---[[
