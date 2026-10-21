@@ -192,13 +192,6 @@ local api = {
                 Skylift = require "@REC_Library.client.class.vehicle.skylift.cl_skylift",
             },
 
-            ---@class REC_Library.Client.API.Class.Vehicle.Train
-            ---@field Train REC_Library.Client.Class.Vehicle.Train.Train
-            Train = {
-                Train = require "@REC_Library.client.class.vehicle.train.cl_train",
-                TrainConfigBuilder = require "@REC_Library.client.class.vehicle.train.cl_trainConfigBuilder",
-            },
-
             Vehicle = require "@REC_Library.client.class.vehicle.cl_vehicle",
             VehicleModsConfigBuilder = require "@REC_Library.client.class.vehicle.cl_vehicleModsConfigBuilder",
         },
